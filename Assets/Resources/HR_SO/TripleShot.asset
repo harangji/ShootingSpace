@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 735c00cc58aa73d499a2468c0d54e6a7, type: 3}
   m_Name: TripleShot
   m_EditorClassIdentifier: Assembly-CSharp::TripleShotSO
-  augmentName: "\uC138\uAC08\uB798 \uBC1C\uC0AC"
-  description: 
+  augmentName: "\uD2B8\uB9AC\uD50C \uC0F7"
+  description: "\uCD94\uAC00 \uD0C4\uD658 +2"
+  type: 0
+  targetWeaponID: Gun_01
   spreadAngle: 15

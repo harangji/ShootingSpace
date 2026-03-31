@@ -1,8 +1,9 @@
 using UnityEngine;
+using UnityEngine.Pool; // 유니티 내장 풀링 시스템 라이브러리 추가!
 using ShootingSpace.Core;
 
 /// <summary>
-/// 기본적인 탄환의 동작을 정의하는 컴포넌트입니다.
+/// 기본적인 탄환의 동작을 정의하며 유니티 내장 풀과 연동되는 컴포넌트입니다.
 /// </summary>
 [RequireComponent(typeof(CircleCollider2D))]
 public class Bullet01 : MonoBehaviour
@@ -12,6 +13,21 @@ public class Bullet01 : MonoBehaviour
     private BulletData _data;
     private bool _isInitialized = false;
 
+    // --- 유니티 내장 풀 참조 ---
+    private IObjectPool<Bullet01> _pool;
+    // -------------------------
+
+    private float _lifeTime = 5f;
+    private float _spawnTime;
+
+    /// <summary>
+    /// 탄환에게 소속된 풀을 알려줍니다.
+    /// </summary>
+    public void SetPool(IObjectPool<Bullet01> pool)
+    {
+        _pool = pool;
+    }
+
     /// <summary>
     /// 탄환을 초기화하고 수명 주기를 설정합니다.
     /// </summary>
@@ -19,40 +35,65 @@ public class Bullet01 : MonoBehaviour
     public void Init(BulletData data)
     {
         _data = data;
-        _isInitialized = true;
+        _spawnTime = Time.time;
         
-        // 5초 뒤 자동 제거
-        Destroy(gameObject, 5f);
+        // 외형 및 크기 적용
+        if (TryGetComponent<SpriteRenderer>(out var sr) && data.bulletSprite != null)
+        {
+            sr.sprite = data.bulletSprite;
+        }
+        transform.localScale = data.scale;
+
+        _isInitialized = true;
     }
 
     private void Update()
     {
         if (!_isInitialized) return;
 
-        // 자신의 Up 방향(Y축)으로 이동 처리
+        // 수명 체크
+        if (Time.time >= _spawnTime + _lifeTime)
+        {
+            ReturnToPool();
+            return;
+        }
+
+        // 이동 처리
         transform.position += transform.up * (_data.speed * Time.deltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Enemy 레이어와 충돌 시 데미지 처리 및 소멸 로직
         if (((1 << other.gameObject.layer) & enemyLayer) != 0)
         {
-            // 충돌한 객체에서 IDamageable 인터페이스가 있는지 확인합니다.
             if (other.TryGetComponent<IDamageable>(out var target))
             {
                 target.TakeDamage(_data.damage);
+                Debug.Log($"데미지 : {_data.damage}");
             }
 
-            // 관통 횟수가 없으면 소멸
             if (_data.pierceCount <= 0)
             {
-                Destroy(gameObject);
+                ReturnToPool();
             }
             else
             {
                 _data.pierceCount--;
             }
+        }
+    }
+
+    private void ReturnToPool()
+    {
+        _isInitialized = false;
+        if (_pool != null)
+        {
+            // 유니티 내장 풀의 반납 방식
+            _pool.Release(this);
+        }
+        else
+        {
+            Destroy(gameObject); // 풀이 없으면 파괴
         }
     }
 }

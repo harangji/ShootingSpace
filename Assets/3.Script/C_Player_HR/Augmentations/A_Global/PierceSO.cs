@@ -18,10 +18,11 @@ public class PierceSO : AugmentSO
     {
         if (context == null || context.bullets == null) return;
 
-        foreach (var bullet in context.bullets)
+        for (int i = 0; i < context.bullets.Count; i++)
         {
-            // 기존 관통 횟수에 설정값을 더해 누적시킵니다.
+            var bullet = context.bullets[i];
             bullet.pierceCount += extraPierceCount;
+            context.bullets[i] = bullet;
         }
     }
 }

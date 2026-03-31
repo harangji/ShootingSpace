@@ -1,8 +1,10 @@
 using UnityEngine;
+using UnityEngine.Pool;
 using ShootingSpace.Core;
+using System.Collections;
 
 /// <summary>
-/// 기본적인 체력 시스템을 가지며 데미지를 입었을 때 파괴되는 적 클래스입니다.
+/// 유니티 내장 풀링 시스템과 연동되며, 피격 피드백을 제공하는 적 클래스입니다.
 /// </summary>
 public class SimpleEnemy : MonoBehaviour, IDamageable
 {
@@ -10,30 +12,75 @@ public class SimpleEnemy : MonoBehaviour, IDamageable
     [SerializeField] private int maxHealth = 30;
     private int _currentHealth;
 
+    [Header("Feedback")]
+    [SerializeField] private Color hitColor = Color.red;
+    [SerializeField] private float hitEffectDuration = 0.1f;
+    private SpriteRenderer _spriteRenderer;
+    private Color _originalColor;
+    private Coroutine _hitEffectCoroutine;
+
+    // --- 유니티 내장 풀 참조 ---
+    private IObjectPool<SimpleEnemy> _pool;
+    // -------------------------
+
     private void Awake()
     {
-        _currentHealth = maxHealth;
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        if (_spriteRenderer != null) _originalColor = _spriteRenderer.color;
     }
-    
+
+    /// <summary>
+    /// 적에게 소속된 풀을 알려줍니다.
+    /// </summary>
+    public void SetPool(IObjectPool<SimpleEnemy> pool)
+    {
+        _pool = pool;
+    }
+
+    private void OnEnable()
+    {
+        _currentHealth = maxHealth;
+        if (_spriteRenderer != null) _spriteRenderer.color = _originalColor;
+    }
+
     public void TakeDamage(int damage)
     {
         _currentHealth -= damage;
-        Debug.Log($"{gameObject.name}이(가) {damage}의 데미지를 입었습니다. (남은 체력: {_currentHealth})");
+        
+        // 피격 피드백 실행
+        if (_hitEffectCoroutine != null) StopCoroutine(_hitEffectCoroutine);
+        _hitEffectCoroutine = StartCoroutine(HitEffectRoutine());
 
-        // 체력이 0 이하가 되면 파괴 처리합니다.
         if (_currentHealth <= 0)
         {
             Die();
         }
     }
 
-    /// <summary>
-    /// 적이 사망했을 때의 처리를 수행합니다.
-    /// </summary>
+    private IEnumerator HitEffectRoutine()
+    {
+        if (_spriteRenderer == null) yield break;
+        
+        _spriteRenderer.color = hitColor;
+        yield return new WaitForSeconds(hitEffectDuration);
+        _spriteRenderer.color = _originalColor;
+    }
+
     private void Die()
     {
-        Debug.Log($"{gameObject.name}이(가) 파괴되었습니다.");
-        
-        Destroy(gameObject);
+        // 사망 처리 (이펙트나 보상 생성 등 가능)
+        ReturnToPool();
+    }
+
+    private void ReturnToPool()
+    {
+        if (_pool != null)
+        {
+            _pool.Release(this);
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
     }
 }

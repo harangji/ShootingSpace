@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,24 +14,60 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float slowDistance = 2.0f;
     [SerializeField] private float rotationSpeed = 720f;
 
+    [Header("Weapon Systems")]
+    [SerializeField] private List<Gun_01> equippedGuns = new List<Gun_01>();
+    private List<IAugment> _globalAugments = new List<IAugment>();
+
     private Vector2 _targetPosition;
     private Camera _mainCamera;
 
     private void Awake()
     {
         _mainCamera = Camera.main;
+        
+        // 장착된 무기가 없으면 자식 오브젝트에서 자동으로 찾음
+        if (equippedGuns.Count == 0)
+        {
+            equippedGuns.AddRange(GetComponentsInChildren<Gun_01>());
+        }
     }
 
     private void Update()
     {
-        // 마우스 월드 좌표 업데이트 (입력 수집은 매 프레임 수행)
+        UpdateTargetPosition();
+    }
+
+    private void UpdateTargetPosition()
+    {
         if (Mouse.current != null)
         {
-            Vector2 mousePos = Mouse.current.position.ReadValue();
-            Vector3 mouseWorldPos = _mainCamera.ScreenToWorldPoint(new Vector3(mousePos.x, mousePos.y, _mainCamera.nearClipPlane));
-            _targetPosition = (Vector2)mouseWorldPos;
+            Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
+            
+            // ScreenToWorldPoint 호출 시 Z값을 카메라와의 거리로 설정해야 정확함
+            Vector3 worldPos = _mainCamera.ScreenToWorldPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, -_mainCamera.transform.position.z));
+            _targetPosition = (Vector2)worldPos;
         }
     }
+
+    /// <summary>
+    /// 새로운 아이템 증강을 획득하여 모든 무기에 적용합니다.
+    /// </summary>
+    public void AddGlobalAugment(AugmentSO augment)
+    {
+        _globalAugments.Add(augment);
+
+        foreach (var gun in equippedGuns)
+        {
+            if (gun != null)
+            {
+                // 각 무기에게 증강 추가 요청 (ID 및 타입 체크 수행)
+                gun.AddAugment(augment);
+            }
+        }
+
+        Debug.Log($"[Player] 전역 증강 획득: {augment.augmentName}냥!");
+    }
+
 
     private void FixedUpdate()
     {
