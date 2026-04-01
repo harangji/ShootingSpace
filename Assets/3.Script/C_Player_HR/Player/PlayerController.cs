@@ -1,119 +1,85 @@
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using UnityEngine.Serialization;
 
 /// <summary>
-/// 플레이어의 이동 및 회전을 제어합니다.
-/// 입력 수집은 Update에서, 실제 물리적 이동 및 회전 처리는 FixedUpdate에서 수행합니다.
+/// 플레이어 시스템의 중앙 컨트롤러입니다. 
+/// 이동, 스탯, 장비 컴포넌트를 조정하고 전체 상태를 관리합니다.
 /// </summary>
+[RequireComponent(typeof(PlayerStatsManager), typeof(PlayerMovement), typeof(PlayerEquipment))]
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement Settings")]
-    [SerializeField] private float moveSpeed = 5f;
-    [SerializeField] private float stopDistance = 0.1f;
-    [SerializeField] private float slowDistance = 2.0f;
-    [SerializeField] private float rotationSpeed = 720f;
-
-    [Header("Weapon Systems")]
-    [SerializeField] private List<Gun_01> equippedGuns = new List<Gun_01>();
-    private List<IAugment> _globalAugments = new List<IAugment>();
-
-    private Vector2 _targetPosition;
-    private Camera _mainCamera;
+    [SerializeField] private PlayerStatsManager stats;
+    [SerializeField] private PlayerMovement movement;
+    [SerializeField] private PlayerEquipment equipment;
 
     private void Awake()
     {
-        _mainCamera = Camera.main;
-        
-        // 장착된 무기가 없으면 자식 오브젝트에서 자동으로 찾음
-        if (equippedGuns.Count == 0)
-        {
-            equippedGuns.AddRange(GetComponentsInChildren<Gun_01>());
-        }
-    }
-
-    private void Update()
-    {
-        UpdateTargetPosition();
-    }
-
-    private void UpdateTargetPosition()
-    {
-        if (Mouse.current != null)
-        {
-            Vector2 mouseScreenPos = Mouse.current.position.ReadValue();
-            
-            // ScreenToWorldPoint 호출 시 Z값을 카메라와의 거리로 설정해야 정확함
-            Vector3 worldPos = _mainCamera.ScreenToWorldPoint(new Vector3(mouseScreenPos.x, mouseScreenPos.y, -_mainCamera.transform.position.z));
-            _targetPosition = (Vector2)worldPos;
-        }
+        // 초기화
+        equipment.Initialize();
+        RefreshAllStats();
     }
 
     /// <summary>
-    /// 새로운 아이템 증강을 획득하여 모든 무기에 적용합니다.
+    /// 플레이어 스탯과 모든 무기 스탯을 최신 상태로 동기화합니다.
     /// </summary>
-    public void AddGlobalAugment(AugmentSO augment)
+    [ContextMenu("Refresh All Stats")]
+    public void RefreshAllStats()
     {
-        _globalAugments.Add(augment);
+        // 1. 플레이어 스탯 갱신
+        stats.Refresh(equipment.ItemSlots);
 
-        foreach (var gun in equippedGuns)
+        // 2. 모든 무기에 플레이어 컨텍스트 및 아이템 효과 전달
+        foreach (var weapon in equipment.WeaponSlots)
         {
-            if (gun != null)
+            if (weapon != null)
             {
-                // 각 무기에게 증강 추가 요청 (ID 및 타입 체크 수행)
-                gun.AddAugment(augment);
+                weapon.RefreshWeaponStats(stats.CurrentContext, equipment.ItemSlots);
             }
         }
 
-        Debug.Log($"[Player] 전역 증강 획득: {augment.augmentName}냥!");
-    }
-
-
-    private void FixedUpdate()
-    {
-        HandleRotation();
-        HandleMovement();
+        Debug.Log("[PlayerController] 모든 시스템 스탯 동기화 완료");
     }
 
     /// <summary>
-    /// 마우스 위치를 향해 부드러운 회전을 처리합니다.
+    /// 새로운 아이템을 장착하고 스탯을 갱신합니다.
     /// </summary>
-    private void HandleRotation()
+    public void EquipItem(ItemAugmentSO augment)
     {
-        Vector2 lookDir = _targetPosition - (Vector2)transform.position;
-        if (lookDir.sqrMagnitude > 0.001f)
+        if (equipment.EquipItem(augment))
         {
-            // Y축 정면 기준 회전 보정 (-90도)
-            float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
-            Quaternion targetRotation = Quaternion.Euler(0, 0, angle);
-            
-            // FixedUpdate 주기에 맞게 deltaTime을 사용 (자동으로 fixedDeltaTime으로 동작)
-            transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.fixedDeltaTime);
+            RefreshAllStats();
         }
     }
 
     /// <summary>
-    /// 마우스 위치를 향해 점진적으로 이동시키며 도착 시 감속을 처리합니다.
+    /// 아이템을 해제하고 스탯을 갱신합니다.
     /// </summary>
-    private void HandleMovement()
+    public void UnequipItem(string augmentName)
     {
-        Vector2 currentPos = transform.position;
-        float distance = Vector2.Distance(currentPos, _targetPosition);
-
-        if (distance > stopDistance)
+        if (equipment.UnequipItem(augmentName))
         {
-            float speed = moveSpeed;
-
-            // 목표 거리에 근접 시 감속 처리
-            if (distance < slowDistance)
-            {
-                speed = moveSpeed * (distance / slowDistance);
-            }
-
-            Vector2 direction = (_targetPosition - currentPos).normalized;
-            
-            // FixedUpdate 주기에 맞게 위치 갱신
-            transform.position += (Vector3)direction * (speed * Time.fixedDeltaTime);
+            RefreshAllStats();
         }
+    }
+
+    /// <summary>
+    /// 전역 아이템 증강이 장착되어 있는지 확인합니다.
+    /// </summary>
+    public bool HasItem(string augmentName)
+    {
+        return equipment.HasItem(augmentName);
+    }
+
+    /// <summary>
+    /// 새로운 무기를 장착하고 스탯을 갱신합니다.
+    /// </summary>
+    public bool EquipWeapon(WeaponBase weaponPrefab, Transform mountPoint)
+    {
+        if (equipment.EquipWeapon(weaponPrefab, mountPoint))
+        {
+            RefreshAllStats();
+            return true;
+        }
+        return false;
     }
 }

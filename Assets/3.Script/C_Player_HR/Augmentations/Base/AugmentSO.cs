@@ -24,4 +24,7 @@ public abstract class AugmentSO : ScriptableObject, IAugment
 
     // 발사 데이터 수정 (필요한 경우 오버라이드)
     public abstract void ModifyFire(FireContext context);
+
+    // 플레이어 스탯 수정 (필요한 경우 오버라이드)
+    public virtual void ModifyPlayer(PlayerContext context) { }
 }

@@ -6,7 +6,7 @@ using ShootingSpace.Core;
 /// 기본적인 탄환의 동작을 정의하며 유니티 내장 풀과 연동되는 컴포넌트입니다.
 /// </summary>
 [RequireComponent(typeof(CircleCollider2D))]
-public class Bullet01 : MonoBehaviour
+public class Bullet01 : MonoBehaviour, IPoolable<Bullet01>
 {
     [SerializeField] private LayerMask enemyLayer;
 
@@ -64,6 +64,9 @@ public class Bullet01 : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        // 이미 반납 처리 중인 경우 무시 (중복 실행 방지)
+        if (!_isInitialized) return;
+
         if (((1 << other.gameObject.layer) & enemyLayer) != 0)
         {
             if (other.TryGetComponent<IDamageable>(out var target))
@@ -85,15 +88,17 @@ public class Bullet01 : MonoBehaviour
 
     private void ReturnToPool()
     {
+        // 이미 반납 처리된 경우 중복 실행 방지
+        if (!_isInitialized) return;
+
         _isInitialized = false;
         if (_pool != null)
         {
-            // 유니티 내장 풀의 반납 방식
             _pool.Release(this);
         }
         else
         {
-            Destroy(gameObject); // 풀이 없으면 파괴
+            Destroy(gameObject);
         }
     }
 }

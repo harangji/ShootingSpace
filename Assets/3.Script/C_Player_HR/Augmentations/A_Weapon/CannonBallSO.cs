@@ -5,7 +5,7 @@ using UnityEngine;
 /// 외형이 커지고 데미지가 증가하지만 탄속이 느려집니다.
 /// </summary>
 [CreateAssetMenu(fileName = "CannonBall", menuName = "ShootingSpace/Augments/Unique/CannonBall")]
-public class CannonBallSO : AugmentSO
+public class CannonBallSO : WeaponAugmentSO
 {
     [Header("Cannon Settings")]
     public Sprite cannonSprite;

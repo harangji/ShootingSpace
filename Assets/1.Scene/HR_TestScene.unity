@@ -423,6 +423,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0579794aae36f2645b6d9b052eba3c01, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShootingSpace.Core.WeaponDebugger
+  playerController: {fileID: 1364515893}
   targetWeapon: {fileID: 484539737}
   augment1: {fileID: 11400000, guid: dfaf6685b919cc74cb445c0c2028997a, type: 2}
   augment2: {fileID: 11400000, guid: 19d4e5c01bc37fa4eb2a41c66c07328b, type: 2}
@@ -1680,13 +1681,14 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Gun
   weaponID: Gun_01
   initialAugments: []
-  baseFireRate: 1
+  baseFireRate: 2
   baseDamage: 10
-  baseBulletSpeed: 10
-  projectile: {fileID: 7383724531794421732, guid: b295ba10b218baa4e9fa30bde0d3194f, type: 3}
+  baseBulletSpeed: 20
+  autoFire: 1
+  projectilePrefab: {fileID: 7383724531794421732, guid: b295ba10b218baa4e9fa30bde0d3194f, type: 3}
   muzzlePoint: {fileID: 725362407}
   defaultBulletSprite: {fileID: 0}
-  autoFire: 1
+  bulletParent: {fileID: 1315608732}
 --- !u!1 &519225849
 GameObject:
   m_ObjectHideFlags: 0
@@ -5063,6 +5065,37 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1315608731
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1315608732}
+  m_Layer: 0
+  m_Name: BulletContainer
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1315608732
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1315608731}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1345622187
 GameObject:
   m_ObjectHideFlags: 0
@@ -5346,6 +5379,9 @@ GameObject:
   m_Component:
   - component: {fileID: 1364515892}
   - component: {fileID: 1364515893}
+  - component: {fileID: 1364515896}
+  - component: {fileID: 1364515895}
+  - component: {fileID: 1364515894}
   m_Layer: 0
   m_Name: Hero
   m_TagString: Untagged
@@ -5382,12 +5418,55 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 974fd50f7e2ae894a8933c09b1dc4604, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
-  moveSpeed: 5
-  stopDistance: 0.5
+  stats: {fileID: 1364515896}
+  movement: {fileID: 1364515895}
+  equipment: {fileID: 1364515894}
+--- !u!114 &1364515894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1364515891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 336917377b7798a4dbb65cc0681b39d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerEquipment
+  maxWeaponSlots: 3
+  maxItemSlots: 5
+  weaponSlots:
+  - {fileID: 484539737}
+  itemSlots: []
+--- !u!114 &1364515895
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1364515891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 837aaa6dbc87d534cbc7a235ebd8501c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerMovement
+  stopDistance: 0.1
   slowDistance: 2
   rotationSpeed: 720
-  equippedGuns:
-  - {fileID: 484539737}
+--- !u!114 &1364515896
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1364515891}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee4f4aba4e3c80745a7dbb2dfa662020, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerStatsManager
+  baseMaxHealth: 100
+  baseMoveSpeed: 5
 --- !u!1 &1375518844
 GameObject:
   m_ObjectHideFlags: 0
@@ -8095,3 +8174,4 @@ SceneRoots:
   - {fileID: 1364515892}
   - {fileID: 777342928}
   - {fileID: 107191014}
+  - {fileID: 1315608732}

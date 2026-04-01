@@ -17,6 +17,12 @@ public interface IAugment
     /// </summary>
     /// <param name="context">발사 관련 컨텍스트 데이터</param>
     void ModifyFire(FireContext context);
+
+    /// <summary>
+    /// 플레이어의 스탯(체력, 이동 속도 등)을 수정합니다.
+    /// </summary>
+    /// <param name="context">플레이어 스탯 컨텍스트</param>
+    void ModifyPlayer(PlayerContext context);
 }
 
 /// <summary>
@@ -27,6 +33,17 @@ public class WeaponContext
     public float fireRateMultiplier = 1.0f;
     public float damageMultiplier = 1.0f;
     public float bulletSpeedMultiplier = 1.0f;
+}
+
+/// <summary>
+/// 플레이어 자체의 스탯을 담는 컨텍스트 클래스입니다.
+/// </summary>
+public class PlayerContext
+{
+    public float maxHealthMultiplier = 1.0f;
+    public float moveSpeedMultiplier = 1.0f;
+    public float expGainMultiplier = 1.0f;
+    public float damageMultiplier = 1.0f; // 모든 무기에 적용되는 데미지 배율
 }
 
 /// <summary>
@@ -58,15 +75,14 @@ public struct BulletData
         speed = 20f,
         scale = Vector3.one
     };
-// 기본값 설정을 위한 생성자
-public BulletData(Vector2 direction, int damage, float speed, Vector3 baseScale, Sprite sprite = null)
-{
-    this.direction = direction;
-    this.damage = damage;
-    this.speed = speed;
-    this.pierceCount = 0;
-    this.bulletSprite = sprite;
-    this.scale = baseScale; // 원본 스케일을 보존한다냥!
+    
+    public BulletData(Vector2 direction, int damage, float speed, Vector3 baseScale, Sprite sprite = null)
+    {
+        this.direction = direction;
+        this.damage = damage;
+        this.speed = speed;
+        this.pierceCount = 0;
+        this.bulletSprite = sprite;
+        this.scale = baseScale; // 원본 스케일을 보존합니다.
+    }
 }
-}
-

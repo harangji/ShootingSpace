@@ -4,7 +4,7 @@ using UnityEngine;
 /// 에셋 메뉴를 통해 생성 가능한 탄환 관통 증강입니다.
 /// </summary>
 [CreateAssetMenu(fileName = "Pierce", menuName = "ShootingSpace/Augments/Pierce")]
-public class PierceSO : AugmentSO
+public class PierceSO : ItemAugmentSO
 {
     [Header("관통 설정")]
     [Tooltip("모든 탄환에 추가될 관통 횟수입니다.")]
