@@ -20,11 +20,21 @@ public class GenericObjectPool<T> where T : Component
     private IObjectPool<T> _pool;
     private T _prefab;
     private Transform _parent;
+    private Transform _subParent; // 클래스별 전용 부모 추가!
 
     public GenericObjectPool(T prefab, Transform parent, int defaultCapacity = 20, int maxSize = 200)
     {
         _prefab = prefab;
         _parent = parent;
+
+        // 클래스 이름을 가진 하위 부모 생성 (예: Bullet_01, Bullet_02)
+        GameObject subParentObj = new GameObject($"{typeof(T).Name}_Pool");
+        _subParent = subParentObj.transform;
+        
+        if (_parent != null)
+        {
+            _subParent.SetParent(_parent);
+        }
 
         // 유니티 내장 ObjectPool 생성
         _pool = new ObjectPool<T>(
@@ -52,7 +62,8 @@ public class GenericObjectPool<T> where T : Component
 
     private T CreateInstance()
     {
-        T instance = UnityEngine.Object.Instantiate(_prefab, _parent);
+        // 이제 전용 부모(_subParent) 밑에 생성됩니다!
+        T instance = UnityEngine.Object.Instantiate(_prefab, _subParent);
         
         // 만약 오브젝트가 IPoolable을 구현하고 있다면, 소속 풀을 알려줍니다.
         if (instance is IPoolable<T> poolable)

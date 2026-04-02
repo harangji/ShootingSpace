@@ -1,20 +1,22 @@
 using UnityEngine;
-using UnityEngine.Pool; // 유니티 내장 풀링 시스템 라이브러리 추가!
+using UnityEngine.Pool;
 using ShootingSpace.Core;
 
 /// <summary>
-/// 기본적인 탄환의 동작을 정의하며 유니티 내장 풀과 연동되는 컴포넌트입니다.
+/// 적중 시 주변의 원형 범위 내의 모든 적에게 데미지를 주는 폭발형 탄환입니다.
 /// </summary>
 [RequireComponent(typeof(CircleCollider2D))]
-public class Bullet01 : MonoBehaviour, IPoolable<Bullet01>
+public class Bullet_02 : MonoBehaviour, IPoolable<Bullet_02>
 {
     [SerializeField] private LayerMask enemyLayer;
+    [SerializeField] private float explosionRadius = 1.5f; // 폭발 범위
+    [SerializeField] private float rotationSpeed = 270f;  // 자전 속도 (도/초)
 
     private BulletData _data;
     private bool _isInitialized = false;
 
     // --- 유니티 내장 풀 참조 ---
-    private IObjectPool<Bullet01> _pool;
+    private IObjectPool<Bullet_02> _pool;
     // -------------------------
 
     private float _lifeTime = 5f;
@@ -23,7 +25,7 @@ public class Bullet01 : MonoBehaviour, IPoolable<Bullet01>
     /// <summary>
     /// 탄환에게 소속된 풀을 알려줍니다.
     /// </summary>
-    public void SetPool(IObjectPool<Bullet01> pool)
+    public void SetPool(IObjectPool<Bullet_02> pool)
     {
         _pool = pool;
     }
@@ -37,6 +39,9 @@ public class Bullet01 : MonoBehaviour, IPoolable<Bullet01>
         _data = data;
         _spawnTime = Time.time;
         
+        // 전달받은 데이터의 방향을 적용!
+        transform.up = data.direction;
+
         // 외형 및 크기 적용
         if (TryGetComponent<SpriteRenderer>(out var sr) && data.bulletSprite != null)
         {
@@ -58,8 +63,11 @@ public class Bullet01 : MonoBehaviour, IPoolable<Bullet01>
             return;
         }
 
-        // 이동 처리
-        transform.position += transform.up * (_data.speed * Time.deltaTime);
+        // 이동 처리 (발사 시 정해진 방향으로 직선 이동)
+        transform.position += (Vector3)_data.direction * (_data.speed * Time.deltaTime);
+
+        // 자전 처리 (이동 방향에 상관없이 스스로 회전)
+        transform.Rotate(Vector3.forward, rotationSpeed * Time.deltaTime);
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -67,14 +75,12 @@ public class Bullet01 : MonoBehaviour, IPoolable<Bullet01>
         // 이미 반납 처리 중인 경우 무시 (중복 실행 방지)
         if (!_isInitialized) return;
 
+        // 적 레이어와 충돌했는지 확인
         if (((1 << other.gameObject.layer) & enemyLayer) != 0)
         {
-            if (other.TryGetComponent<IDamageable>(out var target))
-            {
-                target.TakeDamage(_data.damage);
-                Debug.Log($"데미지 : {_data.damage}");
-            }
+            Explode();
 
+            // 폭발 탄환은 보통 적중 시 소멸하지만, 관통 수치가 있다면 유지할 수도 있습니다.
             if (_data.pierceCount <= 0)
             {
                 ReturnToPool();
@@ -82,6 +88,24 @@ public class Bullet01 : MonoBehaviour, IPoolable<Bullet01>
             else
             {
                 _data.pierceCount--;
+            }
+        }
+    }
+
+    /// <summary>
+    /// 원형 범위 내의 모든 적에게 데미지를 줍니다.
+    /// </summary>
+    private void Explode()
+    {
+        // 원형 범위 내의 모든 Collider2D를 스캔
+        Collider2D[] hitEnemies = Physics2D.OverlapCircleAll(transform.position, explosionRadius, enemyLayer);
+
+        foreach (var enemyCollider in hitEnemies)
+        {
+            if (enemyCollider.TryGetComponent<IDamageable>(out var target))
+            {
+                target.TakeDamage(_data.damage);
+                Debug.Log($"폭발 데미지 적용 : {enemyCollider.name}에게 {_data.damage}의 피해!");
             }
         }
     }
@@ -100,5 +124,12 @@ public class Bullet01 : MonoBehaviour, IPoolable<Bullet01>
         {
             Destroy(gameObject);
         }
+    }
+
+    // 에디터에서 폭발 범위를 시각적으로 확인하기 위한 기즈모
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, explosionRadius);
     }
 }

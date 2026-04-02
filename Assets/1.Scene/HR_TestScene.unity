@@ -1645,7 +1645,7 @@ GameObject:
   - component: {fileID: 484539736}
   - component: {fileID: 484539737}
   m_Layer: 0
-  m_Name: Gun
+  m_Name: Gun_01
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1681,14 +1681,45 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Gun
   weaponID: Gun_01
   initialAugments: []
-  baseFireRate: 2
+  baseFireRate: 1
   baseDamage: 10
-  baseBulletSpeed: 20
+  baseBulletSpeed: 10
   autoFire: 1
   projectilePrefab: {fileID: 7383724531794421732, guid: b295ba10b218baa4e9fa30bde0d3194f, type: 3}
   muzzlePoint: {fileID: 725362407}
   defaultBulletSprite: {fileID: 0}
   bulletParent: {fileID: 1315608732}
+--- !u!1 &484827131
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 484827132}
+  m_Layer: 0
+  m_Name: MuzzlePoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &484827132
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 484827131}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1031164976}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &519225849
 GameObject:
   m_ObjectHideFlags: 0
@@ -3599,6 +3630,61 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
+--- !u!1 &1031164975
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1031164976}
+  - component: {fileID: 1031164977}
+  m_Layer: 0
+  m_Name: Gun_02
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1031164976
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1031164975}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 484827132}
+  m_Father: {fileID: 1364515892}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1031164977
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1031164975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5a8d395d060b44e478f5386d6fb6cb8f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Gun_02
+  weaponID: Gun_02
+  initialAugments: []
+  baseFireRate: 1
+  baseDamage: 10
+  baseBulletSpeed: 10
+  autoFire: 1
+  projectilePrefab: {fileID: 1717433498234902845, guid: 193d2754087099a4290f4073adfb0c7c, type: 3}
+  muzzlePoint: {fileID: 484827132}
+  defaultBulletSprite: {fileID: 0}
+  bulletParent: {fileID: 1315608732}
 --- !u!1 &1041242572
 GameObject:
   m_ObjectHideFlags: 0
@@ -5404,6 +5490,7 @@ Transform:
   m_Children:
   - {fileID: 2000311919}
   - {fileID: 484539736}
+  - {fileID: 1031164976}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1364515893
@@ -5433,11 +5520,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 336917377b7798a4dbb65cc0681b39d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerEquipment
-  maxWeaponSlots: 3
+  maxWeaponSlots: 6
   maxItemSlots: 5
   weaponSlots:
   - {fileID: 484539737}
-  itemSlots: []
+  - {fileID: 1031164977}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  itemSlots:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &1364515895
 MonoBehaviour:
   m_ObjectHideFlags: 0

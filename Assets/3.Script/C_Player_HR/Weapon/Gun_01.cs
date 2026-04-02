@@ -3,7 +3,7 @@ using UnityEngine;
 /// <summary>
 /// ProjectileWeaponBase를 상속받아 구현한 기본 권총 클래스입니다.
 /// </summary>
-public class Gun_01 : ProjectileWeaponBase<Bullet01>
+public class Gun_01 : ProjectileWeaponBase<Bullet_01>
 {
     protected override void GenerateBaseFirePattern(FireContext fireContext)
     {
@@ -15,7 +15,7 @@ public class Gun_01 : ProjectileWeaponBase<Bullet01>
         fireContext.bullets.Add(new BulletData(Vector2.up, finalDamage, finalSpeed, baseScale, defaultBulletSprite));
     }
 
-    protected override void OnProjectileSpawned(Bullet01 projectile, BulletData data)
+    protected override void OnProjectileSpawned(Bullet_01 projectile, BulletData data)
     {
         // 생성된 탄환(Bullet01) 초기화
         projectile.Init(data);
