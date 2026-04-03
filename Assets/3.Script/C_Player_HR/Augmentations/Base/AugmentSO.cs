@@ -3,7 +3,8 @@ using UnityEngine;
 public enum AugmentType
 {
     WeaponUnique, // 특정 무기 전용 증강
-    GlobalItem    // 모든 무기에 영향을 주는 아이템 증강
+    GlobalItem,   // 모든 무기에 영향을 주는 아이템 증강
+    NewWeapon     // 새로운 무기 획득
 }
 
 /// <summary>

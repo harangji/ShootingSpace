@@ -81,7 +81,7 @@ public abstract class WeaponBase : MonoBehaviour, IWeapon
         return false;
     }
 
-    protected bool HasAugment(string augmentName)
+    public bool HasAugment(string augmentName)
     {
         return activeModifiers.Exists(m => (m is AugmentSO so) && so.augmentName == augmentName);
     }

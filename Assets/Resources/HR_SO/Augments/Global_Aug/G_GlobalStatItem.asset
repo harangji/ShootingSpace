@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5db2d05634ae8744e98e92532ace781c, type: 3}
+  m_Name: G_GlobalStatItem
+  m_EditorClassIdentifier: Assembly-CSharp::GlobalStatItemSO
+  augmentName: "[G] \uAC15\uD654(\uD14C\uC2A4\uD2B8\uC6A9)"
+  description: "\uACF5\uACA9\uC18D\uB3C4, \uB370\uBBF8\uC9C0, \uD06C\uAE30 \uC99D\uAC00"
+  type: 1
+  targetWeaponID: 
+  level: 1
+  maxLevel: 5
+  fireRateBoost: 3
+  damageBoost: 2
+  scaleBoost: 3
+  healthMultiplier: 1
+  moveSpeedMultiplier: 1
+  expMultiplier: 1

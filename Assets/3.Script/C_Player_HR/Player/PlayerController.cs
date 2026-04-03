@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerMovement movement;
     [SerializeField] private PlayerEquipment equipment;
 
+    public PlayerEquipment Equipment => equipment;
+
     private void Awake()
     {
         // 초기화

@@ -81,6 +81,7 @@ public class Bullet_01 : MonoBehaviour, IPoolable<Bullet_01>
             }
             else
             {
+                Debug.Log("관통됨");
                 _data.pierceCount--;
             }
         }

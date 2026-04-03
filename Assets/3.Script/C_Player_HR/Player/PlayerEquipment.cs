@@ -80,12 +80,24 @@ public class PlayerEquipment : MonoBehaviour
     }
 
     /// <summary>
-    /// 전역 아이템 증강을 장착합니다.
+    /// 전역 아이템 증강을 장착하거나 레벨업합니다.
     /// </summary>
     public bool EquipItem(ItemAugmentSO augment)
     {
         if (augment == null) return false;
 
+        // 1. 이미 가지고 있는지 확인
+        ItemAugmentSO existing = itemSlots.Find(i => i != null && i.augmentName == augment.augmentName);
+        
+        if (existing != null)
+        {
+            // 이미 있으면 레벨업 (최대 레벨 체크는 Selector에서 수행함)
+            existing.LevelUp();
+            Debug.Log($"[Equipment] {existing.augmentName} 레벨업! (Lv.{existing.level})");
+            return true;
+        }
+
+        // 2. 새로 장착 (빈 슬롯 찾기)
         int emptyIndex = itemSlots.FindIndex(i => i == null);
         if (emptyIndex == -1)
         {
@@ -93,7 +105,10 @@ public class PlayerEquipment : MonoBehaviour
             return false;
         }
 
-        itemSlots[emptyIndex] = augment;
+        // 원본 에셋 보호를 위해 인스턴스화하여 장착
+        ItemAugmentSO instance = Instantiate(augment);
+        itemSlots[emptyIndex] = instance;
+        Debug.Log($"[Equipment] {instance.augmentName} 신규 장착!");
         return true;
     }
 
@@ -105,15 +120,22 @@ public class PlayerEquipment : MonoBehaviour
         int index = itemSlots.FindIndex(i => i != null && i.augmentName == augmentName);
         if (index != -1)
         {
+            ItemAugmentSO target = itemSlots[index];
             itemSlots[index] = null;
+            if (target != null) Destroy(target); // 인스턴스 파괴
             return true;
         }
         return false;
     }
 
     /// <summary>
-    /// 전역 아이템 증강이 장착되어 있는지 확인합니다.
+    /// 전역 아이템 증강이 장착되어 있는지 확인하고, 있다면 해당 인스턴스를 반환합니다.
     /// </summary>
+    public ItemAugmentSO GetItem(string augmentName)
+    {
+        return itemSlots.Find(i => i != null && i.augmentName == augmentName);
+    }
+
     public bool HasItem(string augmentName)
     {
         return itemSlots.Exists(i => i != null && i.augmentName == augmentName);
@@ -133,7 +155,13 @@ public class PlayerEquipment : MonoBehaviour
             return false;
         }
 
+        // 지정된 mountPoint(보통 플레이어)의 자식으로 생성
         WeaponBase newWeapon = Instantiate(weaponPrefab, mountPoint);
+        
+        // 위치 및 회전 초기화하여 플레이어에게 딱 붙게 함
+        newWeapon.transform.localPosition = Vector3.zero;
+        newWeapon.transform.localRotation = Quaternion.identity;
+
         weaponSlots[emptyIndex] = newWeapon;
         return true;
     }
