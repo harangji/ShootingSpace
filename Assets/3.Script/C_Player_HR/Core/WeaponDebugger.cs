@@ -33,13 +33,6 @@ public class WeaponDebugger : MonoBehaviour
 
     private void Awake()
     {
-        // 명시적으로 할당되지 않았을 경우 부모나 자신에게서 찾습니다.
-        if (playerController == null) playerController = GetComponentInParent<PlayerController>();
-        if (targetWeapon == null) targetWeapon = GetComponentInChildren<WeaponBase>();
-
-        // UI 핸들러 초기화 및 UI 생성
-        if (uiHandler == null) uiHandler = GetComponentInChildren<AugmentSelectionUI>();
-        
         if (uiHandler != null)
         {
             // 씬에서 캔버스 찾기

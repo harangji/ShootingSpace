@@ -119,7 +119,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5424205391091935170}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -3.2781906, y: -2.4733202, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -273,9 +273,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FollowEnemy
   maxHealth: 30
-  moveSpeed: 3
+  moveSpeed: 2
   hitColor: {r: 1, g: 0, b: 0, a: 1}
   hitEffectDuration: 0.1
+  spriteRenderer: {fileID: 5121673444219100363}
 --- !u!1 &6826721439378486914
 GameObject:
   m_ObjectHideFlags: 0

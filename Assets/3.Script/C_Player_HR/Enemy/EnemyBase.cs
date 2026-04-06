@@ -9,8 +9,6 @@ using System;
 /// </summary>
 public abstract class EnemyBase : MonoBehaviour, IDamageable
 {
-    public static event Action<EnemyBase> OnEnemyKilled;
-
     [Header("Base Stats")]
     [SerializeField] protected int maxHealth = 30;
     [SerializeField] protected float moveSpeed = 3f;
@@ -19,29 +17,17 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
     [Header("Visual Feedback")]
     [SerializeField] protected Color hitColor = Color.red;
     [SerializeField] protected float hitEffectDuration = 0.1f;
-    protected SpriteRenderer spriteRenderer;
+    [SerializeField] protected SpriteRenderer spriteRenderer;
     protected Color originalColor;
     private Coroutine _hitEffectCoroutine;
 
     protected Transform playerTransform;
     protected bool isDead = false;
 
-    // --- 풀링 시스템 (컴포넌트 타입으로 추상화) ---
-    private IObjectPool<GameObject> _pool;
-
     protected virtual void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         if (spriteRenderer != null) originalColor = spriteRenderer.color;
-        
-        // 플레이어 찾기 (이름이나 태그 등으로 찾을 수 있음)
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player != null) playerTransform = player.transform;
-    }
-
-    public void SetPool(IObjectPool<GameObject> pool)
-    {
-        _pool = pool;
     }
 
     protected virtual void OnEnable()
@@ -49,6 +35,35 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
         currentHealth = maxHealth;
         isDead = false;
         if (spriteRenderer != null) spriteRenderer.color = originalColor;
+        
+        // 활성화될 때 플레이어 참조를 확실히 가져온다냐!
+        EnsurePlayerReference();
+
+        // 중앙 매니저에 등록한다냥!
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.RegisterEnemy(this);
+        }
+    }
+
+    protected virtual void OnDisable()
+    {
+        // 비활성화될 때 중앙 매니저에서 등록 해제한다냥!
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.UnregisterEnemy(this);
+        }
+    }
+
+    /// <summary>
+    /// GameManager로부터 플레이어 참조를 안전하게 가져옵니다.
+    /// </summary>
+    protected void EnsurePlayerReference()
+    {
+        if (playerTransform == null && GameManager.Instance != null)
+        {
+            playerTransform = GameManager.Instance.playerTransform;
+        }
     }
 
     /// <summary>
@@ -93,17 +108,20 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
         if (isDead) return;
         isDead = true;
 
-        // 사망 이벤트 알림
-        OnEnemyKilled?.Invoke(this);
+        // 중앙 매니저에 사망 보고한다냐!
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.ReportEnemyKilled(this);
+        }
 
         ReturnToPool();
     }
 
     protected void ReturnToPool()
     {
-        if (_pool != null)
+        if (EnemyManager.Instance != null)
         {
-            _pool.Release(gameObject);
+            EnemyManager.Instance.ReleaseEnemy(this);
         }
         else
         {

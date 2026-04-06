@@ -33,22 +33,30 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject modeSelectionUI; // 모드 선택 패널
     [SerializeField] private EnemySpawner spawner; // 스포너 참조 추가
 
+    [Title("Player Reference")]
+    [SerializeField] public Transform playerTransform;
+
     private void Awake()
     {
         if (Instance == null) Instance = this;
         else Destroy(gameObject);
-        
-        Time.timeScale = 0f; // 시작 시 정지 (모드 선택 대기)
     }
 
     private void OnEnable()
     {
-        EnemyBase.OnEnemyKilled += HandleEnemyKilled;
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.OnEnemyKilled += HandleEnemyKilled;
+        }
+        StartStageMode();
     }
 
     private void OnDisable()
     {
-        EnemyBase.OnEnemyKilled -= HandleEnemyKilled;
+        if (EnemyManager.Instance != null)
+        {
+            EnemyManager.Instance.OnEnemyKilled -= HandleEnemyKilled;
+        }
     }
 
     /// <summary>
@@ -67,7 +75,6 @@ public class GameManager : MonoBehaviour
         // 스포너 시작
         if (spawner != null) spawner.StartStage(currentStage);
 
-        Time.timeScale = 1f;
         Debug.Log("[GameManager] 모드 1: 스테이지 모드 시작!");
     }
 
@@ -77,17 +84,18 @@ public class GameManager : MonoBehaviour
 
         currentKills++;
 
-        // 목표 달성 체크
+        // 목표 달성 체크 (주석 처리: 스테이지 전환 중단)
+        /*
         if (currentKills >= targetKills)
         {
             EnterSelectionPhase();
         }
+        */
     }
 
     private void EnterSelectionPhase()
     {
         currentState = GameState.Selection;
-        Time.timeScale = 0f; // 게임 일시정지
 
         // 스폰 일시 중단
         if (spawner != null) spawner.StopSpawning();
@@ -111,7 +119,6 @@ public class GameManager : MonoBehaviour
         targetKills = Mathf.RoundToInt(targetKills * killMultiplier);
 
         currentState = GameState.Playing;
-        Time.timeScale = 1f;
 
         // 다음 스테이지 스폰 시작
         if (spawner != null) spawner.StartStage(currentStage);

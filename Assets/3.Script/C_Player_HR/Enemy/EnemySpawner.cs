@@ -28,9 +28,7 @@ public class EnemySpawner : MonoBehaviour
 
     [Title("References")]
     [SerializeField] private Transform playerTransform;
-    [SerializeField] private Transform enemyParent;
 
-    private Dictionary<string, IObjectPool<GameObject>> _pools = new Dictionary<string, IObjectPool<GameObject>>();
     private StageConfig _currentConfig;
     private float _lastSpawnTime;
     private bool _isSpawningActive = false;
@@ -46,44 +44,6 @@ public class EnemySpawner : MonoBehaviour
         {
             GameObject player = GameObject.FindGameObjectWithTag("Player");
             if (player != null) playerTransform = player.transform;
-        }
-
-        if (enemyParent == null)
-        {
-            GameObject parent = GameObject.Find("Enemy_Container");
-            if (parent == null) parent = new GameObject("Enemy_Container");
-            enemyParent = parent.transform;
-        }
-
-        // 모든 스테이지에 등장하는 적 프리팹을 위해 풀 미리 생성
-        HashSet<EnemyBase> allPrefabs = new HashSet<EnemyBase>();
-        foreach (var config in stageConfigs)
-        {
-            if (config.spawnableEnemies != null)
-                allPrefabs.UnionWith(config.spawnableEnemies);
-            
-            // 특수 패턴에 들어있는 적 프리팹도 풀링 대상에 추가
-            foreach (var pattern in config.specialPatterns)
-            {
-                if (pattern is SwarmPattern swarm && swarm.enemyPrefab != null)
-                    allPrefabs.Add(swarm.enemyPrefab);
-            }
-        }
-
-        foreach (var prefab in allPrefabs)
-        {
-            if (prefab == null) continue;
-            string key = prefab.name;
-            if (!_pools.ContainsKey(key))
-            {
-                _pools[key] = new ObjectPool<GameObject>(
-                    () => CreateEnemy(prefab),
-                    OnGetEnemy,
-                    OnReleaseEnemy,
-                    OnDestroyEnemy,
-                    true, 20, 100
-                );
-            }
         }
     }
 
@@ -147,38 +107,11 @@ public class EnemySpawner : MonoBehaviour
 
     public GameObject SpawnEnemyAt(EnemyBase prefab, Vector2 position)
     {
-        if (!_pools.TryGetValue(prefab.name, out var pool)) return null;
+        if (EnemyManager.Instance == null) return null;
 
-        GameObject enemyObj = pool.Get();
+        GameObject enemyObj = EnemyManager.Instance.GetEnemy(prefab);
         enemyObj.transform.position = position;
         return enemyObj;
     }
-
-    // --- 풀링 이벤트 콜백 (CreateEnemy만 prefab 참조 위해 수정) ---
-    private GameObject CreateEnemy(EnemyBase prefab)
-    {
-        GameObject obj = Instantiate(prefab.gameObject, enemyParent);
-        obj.name = prefab.name; 
-        
-        if (obj.TryGetComponent<EnemyBase>(out var enemy))
-        {
-            enemy.SetPool(_pools[prefab.name]);
-        }
-        return obj;
-    }
-
-    private void OnGetEnemy(GameObject obj)
-    {
-        obj.SetActive(true);
-    }
-
-    private void OnReleaseEnemy(GameObject obj)
-    {
-        obj.SetActive(false);
-    }
-
-    private void OnDestroyEnemy(GameObject obj)
-    {
-        Destroy(obj);
-    }
 }
+
