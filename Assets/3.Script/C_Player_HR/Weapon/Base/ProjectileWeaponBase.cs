@@ -107,7 +107,10 @@ public abstract class ProjectileWeaponBase<T> : WeaponBase where T : Component, 
 
         // 1. 전역 아이템 및 플레이어 데미지 배율 적용
         foreach (var item in globalItems) if (item != null) item.ModifyWeapon(currentWeaponContext);
-        currentWeaponContext.damageMultiplier *= playerContext.damageMultiplier;
+        
+        // 필살기 배율과 플레이어 공통 데미지 배율 합산 적용
+        currentWeaponContext.damageMultiplier *= (playerContext.damageMultiplier * playerContext.ultimateDamageMultiplier);
+        currentWeaponContext.fireRateMultiplier *= playerContext.ultimateFireRateMultiplier;
 
         // 2. 무기 고유 증강 적용 (WeaponBase의 activeModifiers 사용)
         foreach (var mod in activeModifiers) mod.ModifyWeapon(currentWeaponContext);
