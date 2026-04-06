@@ -14,6 +14,10 @@ public abstract class WeaponBase : MonoBehaviour, IWeapon
     [SerializeField] protected List<WeaponAugmentSO> initialAugments = new List<WeaponAugmentSO>();
     protected List<IAugment> activeModifiers = new List<IAugment>();
 
+    [Header("Ultimate Skill")]
+    [Tooltip("이 무기에 장착된 필살기입니다.")]
+    [SerializeReference] public UltimateSkillBase ultimateSkill;
+
     public string WeaponID => weaponID;
 
     protected virtual void Awake()

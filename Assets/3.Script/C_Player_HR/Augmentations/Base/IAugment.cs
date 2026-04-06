@@ -44,6 +44,10 @@ public class PlayerContext
     public float moveSpeedMultiplier = 1.0f;
     public float expGainMultiplier = 1.0f;
     public float damageMultiplier = 1.0f; // 모든 무기에 적용되는 데미지 배율
+
+    // 필살기 전용 배율 (기본 1.0)
+    public float ultimateDamageMultiplier = 1.0f;
+    public float ultimateFireRateMultiplier = 1.0f;
 }
 
 /// <summary>
@@ -67,13 +71,25 @@ public struct BulletData
     public Sprite bulletSprite;
     public Vector3 scale;
 
+    // 분열 관련 데이터 추가
+    public int splitCount;          // 분열 시 생성될 탄환 개수
+    public float splitDamageMultiplier; // 분열된 탄환의 데미지 배율
+    public float splitScaleMultiplier;  // 분열된 탄환의 크기 배율
+
+    // 도탄 관련 데이터 추가
+    public int bounceCount;         // 도탄 가능 횟수
+
     // 기본값이 설정된 BulletData를 반환하는 정적 속성
     public static BulletData Default => new BulletData
     {
         direction = Vector2.up,
         damage = 10,
         speed = 20f,
-        scale = Vector3.one
+        scale = Vector3.one,
+        splitCount = 0,
+        splitDamageMultiplier = 0.5f,
+        splitScaleMultiplier = 0.5f,
+        bounceCount = 0
     };
     
     public BulletData(Vector2 direction, int damage, float speed, Vector3 baseScale, Sprite sprite = null)
@@ -83,6 +99,10 @@ public struct BulletData
         this.speed = speed;
         this.pierceCount = 0;
         this.bulletSprite = sprite;
-        this.scale = baseScale; // 원본 스케일을 보존합니다.
+        this.scale = baseScale;
+        this.splitCount = 0;
+        this.splitDamageMultiplier = 0.5f;
+        this.splitScaleMultiplier = 0.5f;
+        this.bounceCount = 0;
     }
 }

@@ -16,9 +16,83 @@ public class AugmentSelectionUI : MonoBehaviour
     [Tooltip("한글을 지원하는 TMP Font Asset을 할당해주세요. 비어있으면 기본 폰트를 사용합니다.")]
     [SerializeField] private TMP_FontAsset fontAsset;
 
+    [Header("Data References")]
+    [SerializeField] private AugmentLibrarySO library;
+    [SerializeField] private PlayerController player;
+
     public GameObject SelectionPanel { get; private set; }
     public Button[] ChoiceButtons { get; private set; }
     public TextMeshProUGUI[] ChoiceTexts { get; private set; }
+
+    /// <summary>
+    /// 증강 선택창을 활성화하고 랜덤 후보를 표시합니다.
+    /// </summary>
+    public void ShowSelection()
+    {
+        if (SelectionPanel == null)
+        {
+            Canvas canvas = FindFirstObjectByType<Canvas>();
+            if (canvas != null) CreateUI(canvas);
+        }
+
+        if (library == null || player == null)
+        {
+            Debug.LogError("[SelectionUI] 라이브러리 또는 플레이어 참조가 없습니다!");
+            return;
+        }
+
+        // 1. 랜덤 증강 3개 가져오기
+        List<AugmentSO> choices = AugmentSelector.GetRandomAugments(player.Equipment, library, 3);
+        
+        SelectionPanel.SetActive(true);
+
+        // 2. 버튼 설정
+        for (int i = 0; i < ChoiceButtons.Length; i++)
+        {
+            if (i < choices.Count)
+            {
+                var augment = choices[i];
+                ChoiceButtons[i].gameObject.SetActive(true);
+                ChoiceTexts[i].text = $"<b>{augment.augmentName}</b>\n\n<size=24>{augment.description}</size>";
+                
+                // 클릭 이벤트 설정 (기존 리스너 제거 필수)
+                ChoiceButtons[i].onClick.RemoveAllListeners();
+                ChoiceButtons[i].onClick.AddListener(() => SelectAugment(augment));
+            }
+            else
+            {
+                ChoiceButtons[i].gameObject.SetActive(false);
+            }
+        }
+    }
+
+    private void SelectAugment(AugmentSO augment)
+    {
+        Debug.Log($"[SelectionUI] 선택된 증강: {augment.augmentName}");
+        
+        // 1. 증강 적용
+        if (augment is ItemAugmentSO item)
+        {
+            player.EquipItem(item);
+        }
+        else if (augment is WeaponUnlockSO unlock)
+        {
+            player.EquipWeapon(unlock.weaponPrefab, player.transform);
+        }
+        else if (augment is WeaponAugmentSO wAug)
+        {
+            // 해당 ID의 무기를 찾아 증강 추가
+            var targetWeapon = player.Equipment.WeaponSlots.Find(w => w != null && w.WeaponID == wAug.targetWeaponID);
+            if (targetWeapon != null) targetWeapon.AddAugment(wAug);
+        }
+
+        // 2. UI 닫기 및 게임 재개
+        SelectionPanel.SetActive(false);
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.ResumeAfterSelection();
+        }
+    }
 
     public void CreateUI(Canvas canvas)
     {
