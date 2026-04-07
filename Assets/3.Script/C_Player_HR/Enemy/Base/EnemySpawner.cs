@@ -59,6 +59,18 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
+        // --- 스테이지 시작 시 적 프리웜(Pre-warm) 수행 ---
+        if (EnemyManager.Instance != null && _currentConfig.spawnableEnemies != null)
+        {
+            foreach (var enemyPrefab in _currentConfig.spawnableEnemies)
+            {
+                if (enemyPrefab != null)
+                {
+                    EnemyManager.Instance.PreWarmEnemy(enemyPrefab, 20); // 각 종류별 20마리씩 미리 생성
+                }
+            }
+        }
+
         _isSpawningActive = true;
         _lastSpawnTime = Time.time;
 

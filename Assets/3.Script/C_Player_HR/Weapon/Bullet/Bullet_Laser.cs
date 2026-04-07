@@ -9,7 +9,7 @@ using ShootingSpace.Core;
 public class Bullet_Laser : MonoBehaviour, IPoolable<Bullet_Laser>
 {
     [SerializeField] private LayerMask enemyLayer;
-    [SerializeField] private float rotationSpeed = 0f; // 레이저는 보통 자전하지 않음
+    private float rotationSpeed = 0f;
 
     private BulletData _data;
     private bool _isInitialized = false;

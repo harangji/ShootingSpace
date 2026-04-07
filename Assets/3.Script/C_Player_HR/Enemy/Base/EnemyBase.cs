@@ -36,10 +36,10 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
         isDead = false;
         if (spriteRenderer != null) spriteRenderer.color = originalColor;
         
-        // 활성화될 때 플레이어 참조를 확실히 가져온다냐!
+        // 활성화될 때 플레이어 참조를 확실히 가져옴
         EnsurePlayerReference();
 
-        // 중앙 매니저에 등록한다냥!
+        // 중앙 매니저에 등록
         if (EnemyManager.Instance != null)
         {
             EnemyManager.Instance.RegisterEnemy(this);
@@ -48,7 +48,7 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
 
     protected virtual void OnDisable()
     {
-        // 비활성화될 때 중앙 매니저에서 등록 해제한다냥!
+        // 비활성화될 때 중앙 매니저에서 등록 해제
         if (EnemyManager.Instance != null)
         {
             EnemyManager.Instance.UnregisterEnemy(this);
@@ -108,7 +108,7 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
         if (isDead) return;
         isDead = true;
 
-        // 중앙 매니저에 사망 보고한다냐!
+        // 중앙 매니저에 사망 보고
         if (EnemyManager.Instance != null)
         {
             EnemyManager.Instance.ReportEnemyKilled(this);

@@ -18,6 +18,7 @@ public abstract class ProjectileWeaponBase<T> : WeaponBase where T : Component, 
     [SerializeField] protected Transform muzzlePoint;
     [SerializeField] protected Sprite defaultBulletSprite;
     [SerializeField] protected Transform bulletParent;
+    [SerializeField] protected int preWarmCount = 20;
 
     // 실시간 계산용 데이터
     protected GenericObjectPool<T> pool;
@@ -32,7 +33,7 @@ public abstract class ProjectileWeaponBase<T> : WeaponBase where T : Component, 
         // 공용 제네릭 풀 초기화
         if (projectilePrefab != null)
         {
-            pool = new GenericObjectPool<T>(projectilePrefab, bulletParent);
+            pool = new GenericObjectPool<T>(projectilePrefab, bulletParent, preWarmCount, 200, preWarmCount);
         }
 
         base.Awake();

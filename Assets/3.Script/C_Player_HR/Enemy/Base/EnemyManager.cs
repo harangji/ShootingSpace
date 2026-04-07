@@ -42,16 +42,49 @@ public class EnemyManager : MonoBehaviour
         string key = prefab.name;
         if (!_pools.ContainsKey(key))
         {
-            _pools[key] = new ObjectPool<GameObject>(
-                () => CreateEnemyInstance(prefab),
-                OnGetEnemy,
-                OnReleaseEnemy,
-                OnDestroyEnemy,
-                true, 20, 100
-            );
+            // 처음 요청 시 기본적으로 20마리 프리웜
+            _pools[key] = CreatePool(prefab, 20);
         }
 
         return _pools[key].Get();
+    }
+
+    /// <summary>
+    /// 특정 적 프리팹을 미리 일정량 생성해둡니다.
+    /// </summary>
+    public void PreWarmEnemy(EnemyBase prefab, int count)
+    {
+        string key = prefab.name;
+        if (!_pools.ContainsKey(key))
+        {
+            _pools[key] = CreatePool(prefab, count);
+        }
+    }
+
+    private IObjectPool<GameObject> CreatePool(EnemyBase prefab, int preWarmCount)
+    {
+        IObjectPool<GameObject> pool = new ObjectPool<GameObject>(
+            () => CreateEnemyInstance(prefab),
+            OnGetEnemy,
+            OnReleaseEnemy,
+            OnDestroyEnemy,
+            true, 20, 100
+        );
+
+        if (preWarmCount > 0)
+        {
+            GameObject[] tempArray = new GameObject[preWarmCount];
+            for (int i = 0; i < preWarmCount; i++)
+            {
+                tempArray[i] = pool.Get();
+            }
+            for (int i = 0; i < preWarmCount; i++)
+            {
+                pool.Release(tempArray[i]);
+            }
+        }
+
+        return pool;
     }
 
     /// <summary>
@@ -73,7 +106,7 @@ public class EnemyManager : MonoBehaviour
     private GameObject CreateEnemyInstance(EnemyBase prefab)
     {
         GameObject obj = Instantiate(prefab.gameObject, enemyContainer);
-        obj.name = prefab.name; // 풀링 키로 사용하기 위해 이름을 고정한다냐!
+        obj.name = prefab.name; // 풀링 키로 사용하기 위해 이름을 고정
         return obj;
     }
 
@@ -95,7 +128,7 @@ public class EnemyManager : MonoBehaviour
     public void ReportEnemyKilled(EnemyBase enemy)
     {
         OnEnemyKilled?.Invoke(enemy);
-        // Unregister는 OnDisable에서 자동으로 처리된다냥!
+        // Unregister는 OnDisable에서 자동으로 처리
     }
 
     public void KillAllEnemies()
