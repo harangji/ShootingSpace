@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.Pool; // 유니티 내장 풀링 시스템 라이브러리 추가!
 using ShootingSpace.Core;
-using System.Linq; // FindObjectsOfTypeAll 사용을 위해 추가
+
 
 /// <summary>
 /// 가장 가까운 적을 추적하며 이동하는 유도 탄환의 동작을 정의하고,
@@ -97,16 +97,16 @@ public class Bullet_03 : MonoBehaviour, IPoolable<Bullet_03>
 
     private void FindNearestEnemy()
     {
-        // Scene에 있는 모든 SimpleEnemy를 찾아서 가장 가까운 적을 선택
-        // 이 방법은 성능에 영향을 줄 수 있으므로, 실제 게임에서는 EnemyManager에서 관리하는 리스트를 활용하는 것이 좋습니다.
-        SimpleEnemy[] allEnemies = FindObjectsByType<SimpleEnemy>(FindObjectsSortMode.None); // 활성화된 오브젝트만 찾음
+        // EnemyManager에서 관리하는 활성화된 적 리스트를 활용
+        // 'FindObjectsByType' 방식은 성능에 영향을 줄 수 있으므로 이 방법을 사용합니다.
         float minDistance = float.MaxValue;
         Transform nearestEnemy = null;
 
-        foreach (SimpleEnemy enemy in allEnemies)
+        if (EnemyManager.Instance != null)
         {
-            if (enemy.gameObject.activeInHierarchy) // 활성화된 적만 고려
+            foreach (EnemyBase enemy in EnemyManager.Instance.ActiveEnemies)
             {
+                // EnemyManager.ActiveEnemies는 이미 활성화된 적만 포함하므로 activeInHierarchy 체크는 불필요
                 float distance = Vector2.Distance(transform.position, enemy.transform.position);
                 if (distance < minDistance)
                 {
@@ -114,6 +114,11 @@ public class Bullet_03 : MonoBehaviour, IPoolable<Bullet_03>
                     nearestEnemy = enemy.transform;
                 }
             }
+        }
+        else
+        {
+            // EnemyManager가 없을 경우 (예: 에디터에서 단독 실행 시)를 위한 폴백 또는 경고
+            Debug.LogWarning("EnemyManager.Instance가 없습니다. 가장 가까운 적을 찾을 수 없습니다.");
         }
         m_targetEnemy = nearestEnemy;
     }
