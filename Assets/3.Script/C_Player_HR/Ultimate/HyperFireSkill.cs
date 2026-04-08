@@ -12,12 +12,11 @@ public class HyperFireSkill : UltimateSkillBase
 
     public override void Activate(PlayerController controller)
     {
-        // 1. 플레이어 컨텍스트에 필살기 배율 적용
-        PlayerStatsManager stats = controller.GetComponent<PlayerStatsManager>();
+        // 1. GameManager를 통해 플레이어 스탯 매니저에 접근
+        var stats = GameManager.Instance.playerStats;
         if (stats != null)
         {
-            stats.CurrentContext.ultimateFireRateMultiplier = fireRateMultiplier;
-            stats.CurrentContext.ultimateDamageMultiplier = damageMultiplier;
+            stats.SetUltimateMultipliers(damageMultiplier, fireRateMultiplier);
         }
 
         // 2. 모든 무기 스탯 갱신
@@ -28,12 +27,11 @@ public class HyperFireSkill : UltimateSkillBase
 
     public override void Deactivate(PlayerController controller)
     {
-        // 1. 배율 원복
-        PlayerStatsManager stats = controller.GetComponent<PlayerStatsManager>();
+        // 1. 배율 원복 (1.0으로 초기화)
+        var stats = GameManager.Instance.playerStats;
         if (stats != null)
         {
-            stats.CurrentContext.ultimateFireRateMultiplier = 1.0f;
-            stats.CurrentContext.ultimateDamageMultiplier = 1.0f;
+            stats.SetUltimateMultipliers(1.0f, 1.0f);
         }
 
         // 2. 모든 무기 스탯 갱신

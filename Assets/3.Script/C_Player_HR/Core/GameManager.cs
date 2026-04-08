@@ -35,10 +35,30 @@ public class GameManager : MonoBehaviour
 
     [Title("Player Reference")]
     [SerializeField] public Transform playerTransform;
+    [SerializeField] public PlayerStatsManager playerStats;
 
     private void Awake()
     {
-        if (Instance == null) Instance = this;
+        if (Instance == null)
+        {
+            Instance = this;
+            
+            // 플레이어 자동 찾기 (인스펙터에서 비어있을 경우)
+            if (playerTransform == null)
+            {
+                var player = GameObject.FindWithTag("Player");
+                if (player != null) playerTransform = player.transform;
+            }
+
+            if (playerStats == null && playerTransform != null)
+            {
+                playerStats = playerTransform.GetComponent<PlayerStatsManager>();
+            }
+            else if (playerStats == null)
+            {
+                playerStats = Object.FindFirstObjectByType<PlayerStatsManager>();
+            }
+        }
         else Destroy(gameObject);
     }
 
