@@ -170,6 +170,55 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1706843661}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &477534105
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 477534106}
+  - component: {fileID: 477534107}
+  m_Layer: 0
+  m_Name: UltimateGaugeUI
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &477534106
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477534105}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1706843661}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &477534107
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 477534105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 195b9b8fca545f54abcfbe040fa89e0d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UltimateGaugeUI
+  xOffset: 20
+  yOffset: 20
+  width: 250
+  height: 30
+  ultimateManager: {fileID: 0}
 --- !u!1 &538521569
 GameObject:
   m_ObjectHideFlags: 0
@@ -1098,7 +1147,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerUltimateManager
   currentSkill:
-    rid: -2
+    rid: 2947259781662900298
   maxGauge: 100
   autoChargePerSecond: 5
   currentGauge: 0
@@ -1106,8 +1155,14 @@ MonoBehaviour:
   references:
     version: 2
     RefIds:
-    - rid: -2
-      type: {class: , ns: , asm: }
+    - rid: 2947259781662900298
+      type: {class: HyperFireSkill, ns: , asm: Assembly-CSharp}
+      data:
+        skillName: New Ultimate
+        requiredGauge: 100
+        duration: 5
+        fireRateMultiplier: 3
+        damageMultiplier: 3
 --- !u!1 &1366379126
 GameObject:
   m_ObjectHideFlags: 0
@@ -1326,8 +1381,9 @@ Transform:
   - {fileID: 614626348}
   - {fileID: 959747947}
   - {fileID: 643045877}
-  - {fileID: 1366379127}
   - {fileID: 107191014}
+  - {fileID: 1366379127}
+  - {fileID: 477534106}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1707486636

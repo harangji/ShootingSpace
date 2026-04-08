@@ -1,43 +1,53 @@
 using UnityEngine;
-using UnityEngine.UI;
 using Sirenix.OdinInspector;
 
 /// <summary>
-/// 필살기 게이지를 화면에 시각화하는 UI 클래스입니다.
+/// OnGUI(IMGUI)를 사용하여 화면에 필살기 게이지를 시각적으로 표시하는 테스트용 UI 클래스입니다.
 /// </summary>
 public class UltimateGaugeUI : MonoBehaviour
 {
-    [Title("UI References")]
-    [SerializeField] private Slider gaugeSlider;
-    [SerializeField] private Image fillImage;
-    [SerializeField] private GameObject readyEffect; // 게이지가 가득 찼을 때 활성화될 이펙트/텍스트
+    [Title("GUI Settings")]
+    [SerializeField] private float xOffset = 20f;
+    [SerializeField] private float yOffset = 20f;
+    [SerializeField] private float width = 250f;
+    [SerializeField] private float height = 30f;
 
     [Title("Logic Reference")]
     [SerializeField] private PlayerUltimateManager ultimateManager;
 
-    private void Update()
+    private void OnGUI()
     {
-        if (ultimateManager == null) return;
+        if (ultimateManager == null)
+        {
+            // 매니저가 연결되어 있지 않다면 씬에서 자동으로 찾아본다냥!
+            ultimateManager = Object.FindFirstObjectByType<PlayerUltimateManager>();
+            if (ultimateManager == null) return;
+        }
 
         float ratio = ultimateManager.GaugeRatio;
+        bool canUse = ultimateManager.CanUse;
 
-        // 1. 슬라이더 업데이트
-        if (gaugeSlider != null)
-        {
-            gaugeSlider.value = ratio;
-        }
+        // 1. 전체 배경 박스
+        Rect rect = new Rect(xOffset, yOffset, width, height);
+        GUI.Box(rect, "");
 
-        // 2. 이미지 FillAmount 업데이트 (슬라이더 대신 이미지만 쓸 경우)
-        if (fillImage != null)
-        {
-            fillImage.fillAmount = ratio;
-        }
+        // 2. 게이지 바 (색상을 입혀서 겹쳐 그린다냥)
+        Color oldColor = GUI.color;
+        GUI.color = canUse ? Color.cyan : Color.yellow;
+        
+        // 게이지 길이에 맞춰 박스를 그린다냥
+        GUI.Box(new Rect(xOffset, yOffset, width * ratio, height), "");
+        GUI.color = oldColor;
 
-        // 3. 준비 완료 효과
-        if (readyEffect != null)
+        // 3. 중앙에 텍스트 표시
+        string statusText = canUse ? "★ ULTIMATE READY (Mouse Right) ★" : $"Ultimate Gauge: {(ratio * 100):F0}%";
+        GUIStyle labelStyle = new GUIStyle(GUI.skin.label)
         {
-            readyEffect.SetActive(ultimateManager.CanUse);
-        }
+            alignment = TextAnchor.MiddleCenter,
+            fontStyle = FontStyle.Bold
+        };
+        
+        GUI.Label(rect, statusText, labelStyle);
     }
 
     /// <summary>
