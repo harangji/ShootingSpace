@@ -7,19 +7,37 @@ using Sirenix.OdinInspector;
 /// </summary>
 public class PlayerUltimateManager : MonoBehaviour
 {
-    [Title("Settings")]
-    [SerializeField, SerializeReference] private UltimateSkillBase currentSkill;
-    [SerializeField] private float maxGauge = 100f;
-    [SerializeField] private float autoChargePerSecond = 5f; // 초당 자동 충전량 (테스트용)
+    [TitleGroup("필살기 구성", "필살기 스킬과 게이지의 기본 설정을 관리합니다.", alignment: TitleAlignments.Left)]
+    [BoxGroup("필살기 구성/기본 설정")]
+    [LabelText("현재 장착된 필살기"), SerializeReference]
+    [Tooltip("수동으로 할당하거나, 무기에 장착된 필살기가 자동으로 사용됩니다.")]
+    private UltimateSkillBase currentSkill;
 
-    [Title("Current State")]
-    [SerializeField, ReadOnly] private float currentGauge = 0f;
-    [SerializeField, ReadOnly] private bool isUltimateActive = false;
+    [BoxGroup("필살기 구성/기본 설정")]
+    [LabelText("최대 게이지 수치"), SuffixLabel("Point")]
+    [Tooltip("필살기를 사용하기 위해 가득 채워야 하는 목표치입니다.")]
+    [SerializeField] private float maxGauge = 100f;
+
+    [BoxGroup("필살기 구성/기본 설정")]
+    [LabelText("초당 자동 충전량"), SuffixLabel("P/sec")]
+    [Tooltip("적을 처치하지 않아도 매초 자동으로 차오르는 게이지 양입니다.")]
+    [SerializeField] private float autoChargePerSecond = 5f;
+
+    [TitleGroup("실시간 상태", "현재 필살기 게이지의 충전 상태와 활성화 여부입니다.")]
+    [ShowInInspector, LabelText("현재 충전 상태"), ProgressBar(0, "maxGauge", ColorGetter = "GetGaugeColor")]
+    private float currentGauge = 0f;
+
+    [ShowInInspector, LabelText("필살기 가동 여부"), GUIColor("GetActiveColor")]
+    [InfoBox("필살기가 활성화된 상태에서는 게이지가 충전되지 않습니다. 🐾", InfoMessageType.None, "isUltimateActive")]
+    private bool isUltimateActive = false;
 
     private PlayerController _controller;
 
     public float GaugeRatio => Mathf.Clamp01(currentGauge / maxGauge);
     public bool CanUse => currentGauge >= maxGauge && !isUltimateActive;
+
+    private Color GetGaugeColor(float value) => value >= maxGauge ? Color.cyan : Color.yellow;
+    private Color GetActiveColor() => isUltimateActive ? Color.green : Color.white;
 
     private void Awake()
     {
@@ -30,59 +48,49 @@ public class PlayerUltimateManager : MonoBehaviour
     {
         if (isUltimateActive) return;
 
-        // 1. 자동 충전 로직 (실제 게임에서는 적 처치 시 등으로 변경 가능!)
+        // 1. 자동 충전 로직
         AddGauge(autoChargePerSecond * Time.deltaTime);
 
         // 2. 입력 감지 (우클릭 사용)
-        if (Mouse.current.rightButton.wasPressedThisFrame)
+        if (Mouse.current != null && Mouse.current.rightButton.wasPressedThisFrame)
         {
             TryUseUltimate();
         }
     }
 
     /// <summary>
-    /// 외부(적 처치 등)에서 게이지를 추가할 때 사용합니다.
+    /// 외부(적 처치 등)에서 게이지를 추가할 때 호출합니다.
     /// </summary>
     public void AddGauge(float amount)
     {
         if (isUltimateActive) return;
-
         currentGauge = Mathf.Min(currentGauge + amount, maxGauge);
     }
 
-    /// <summary>
-    /// 무기들 중에서 장착된 필살기를 찾아 반환합니다.
-    /// </summary>
     private UltimateSkillBase GetAvailableUltimate()
     {
-        // 1. 만약 매니저에 직접 할당된 게 있다면 우선 사용
         if (currentSkill != null) return currentSkill;
 
-        // 2. 장착된 무기들을 순회하며 필살기가 있는지 확인
         if (_controller != null && _controller.Equipment != null)
         {
             foreach (var weapon in _controller.Equipment.WeaponSlots)
             {
                 if (weapon != null && weapon.ultimateSkill != null)
-                {
                     return weapon.ultimateSkill;
-                }
             }
         }
         return null;
     }
 
-    /// <summary>
-    /// 필살기 사용을 시도합니다.
-    /// </summary>
-    [Button("Force Use Ultimate (Debug)")]
+    [TitleGroup("테스트 및 디버그")]
+    [Button("필살기 강제 발동", ButtonSizes.Large), GUIColor(0, 1, 1)]
     public void TryUseUltimate()
     {
         UltimateSkillBase skill = GetAvailableUltimate();
 
         if (skill == null)
         {
-            Debug.LogWarning("[Ultimate] 장착된 무기에 필살기가 없습니다.");
+            Debug.LogWarning("[Ultimate] 사용할 수 있는 필살기가 없습니다.");
             return;
         }
 
@@ -92,37 +100,27 @@ public class PlayerUltimateManager : MonoBehaviour
             return;
         }
 
-        // 필살기 실행
         ExecuteUltimate(skill);
     }
 
     private void ExecuteUltimate(UltimateSkillBase skill)
     {
         isUltimateActive = true;
-        currentGauge = 0f; // 게이지 소모
+        currentGauge = 0f;
 
         Debug.Log($"[Ultimate] 필살기 '{skill.SkillName}' 발동!!!");
         skill.Activate(_controller);
 
-        // 지속 시간이 있는 경우 일정 시간 뒤에 비활성화 처리
         if (skill.Duration > 0)
-        {
-            // Deactivate 시 현재 실행 중인 스킬 정보를 전달하기 위해 코루틴 사용
             StartCoroutine(WaitAndDeactivate(skill));
-        }
         else
-        {
             isUltimateActive = false;
-        }
     }
 
     private System.Collections.IEnumerator WaitAndDeactivate(UltimateSkillBase skill)
     {
         yield return new WaitForSeconds(skill.Duration);
-        if (skill != null)
-        {
-            skill.Deactivate(_controller);
-        }
+        if (skill != null) skill.Deactivate(_controller);
         isUltimateActive = false;
         Debug.Log($"[Ultimate] 필살기 '{skill.SkillName}' 지속 시간 종료");
     }

@@ -1,10 +1,11 @@
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 public enum AugmentType
 {
-    WeaponUnique, // 특정 무기 전용 증강
-    GlobalItem,   // 모든 무기에 영향을 주는 아이템 증강
-    NewWeapon     // 새로운 무기 획득
+    [LabelText("무기 고유 증강")] WeaponUnique,
+    [LabelText("전역 아이템 증강")] GlobalItem,
+    [LabelText("무기 해금")] NewWeapon
 }
 
 /// <summary>
@@ -12,20 +13,21 @@ public enum AugmentType
 /// </summary>
 public abstract class AugmentSO : ScriptableObject, IAugment
 {
-    [Header("Augment Info")]
+    [Title("증강 기본 정보", "증강의 정체성을 정의합니다.")]
+    [LabelText("증강 이름"), Tooltip("게임 내에서 표시될 이름입니다.")]
     public string augmentName;
-    [TextArea] public string description;
+
+    [LabelText("설명"), TextArea(3, 5)]
+    public string description;
+
+    [LabelText("증강 타입")]
     public AugmentType type;
     
-    [Tooltip("무기 고유 증강일 경우, 대상 무기의 ID와 일치해야 합니다.")]
+    [LabelText("대상 무기 ID"), Tooltip("무기 고유 증강일 경우 대상 무기의 ID와 일치해야 합니다.")]
+    [ShowIf("type", AugmentType.WeaponUnique)]
     public string targetWeaponID;
 
-    // 무기 스탯 수정 (필요한 경우 오버라이드)
     public virtual void ModifyWeapon(WeaponContext context) { }
-
-    // 발사 데이터 수정 (필요한 경우 오버라이드)
     public abstract void ModifyFire(FireContext context);
-
-    // 플레이어 스탯 수정 (필요한 경우 오버라이드)
     public virtual void ModifyPlayer(PlayerContext context) { }
 }

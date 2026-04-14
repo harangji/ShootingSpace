@@ -19,7 +19,7 @@ public class UltimateGaugeUI : MonoBehaviour
     {
         if (ultimateManager == null)
         {
-            // 매니저가 연결되어 있지 않다면 씬에서 자동으로 찾아본다냥!
+            // 매니저가 연결되어 있지 않다면 씬에서 자동으로 찾습니다.
             ultimateManager = Object.FindFirstObjectByType<PlayerUltimateManager>();
             if (ultimateManager == null) return;
         }
@@ -31,11 +31,11 @@ public class UltimateGaugeUI : MonoBehaviour
         Rect rect = new Rect(xOffset, yOffset, width, height);
         GUI.Box(rect, "");
 
-        // 2. 게이지 바 (색상을 입혀서 겹쳐 그린다냥)
+        // 2. 게이지 바 (색상을 입혀서 겹쳐 그립니다)
         Color oldColor = GUI.color;
         GUI.color = canUse ? Color.cyan : Color.yellow;
         
-        // 게이지 길이에 맞춰 박스를 그린다냥
+        // 게이지 길이에 맞춰 박스를 그립니다.
         GUI.Box(new Rect(xOffset, yOffset, width * ratio, height), "");
         GUI.color = oldColor;
 

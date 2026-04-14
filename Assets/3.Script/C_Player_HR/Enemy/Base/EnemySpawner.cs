@@ -9,12 +9,18 @@ using Sirenix.OdinInspector;
 [System.Serializable]
 public class StageConfig
 {
+    [LabelText("스테이지 번호")]
     public int stageNumber;
-    public List<EnemyBase> spawnableEnemies; // 이 단계에서 나올 적들
-    public float spawnInterval = 1.0f;       // 이 단계의 기본 스폰 간격
+
+    [LabelText("등장 적 리스트"), AssetSelector(Paths = "Assets/9.Prefab/HR/Enemy")]
+    public List<EnemyBase> spawnableEnemies;
+
+    [LabelText("스폰 간격"), SuffixLabel("초")]
+    public float spawnInterval = 1.0f;
     
     [SerializeReference] 
-    public List<SpecialPatternBase> specialPatterns; // 이 단계에서 발생할 특수 패턴들
+    [LabelText("특수 패턴 리스트")]
+    public List<SpecialPatternBase> specialPatterns;
 }
 
 /// <summary>
@@ -22,14 +28,29 @@ public class StageConfig
 /// </summary>
 public class EnemySpawner : MonoBehaviour
 {
-    [Title("Stage Settings")]
+    [Title("스테이지 설정")]
+    [ListDrawerSettings(ShowIndexLabels = true)]
     [SerializeField] private List<StageConfig> stageConfigs;
-    [SerializeField] private float spawnRadius = 15f; // 소환 거리 (화면 밖)
 
-    [Title("References")]
+    [LabelText("스폰 반경"), SuffixLabel("단위")]
+    [SerializeField] private float spawnRadius = 15f;
+
+    [Title("동적 난이도 조절")]
+    [LabelText("동적 간격 사용")]
+    [SerializeField] private bool useDynamicInterval = true;
+
+    [LabelText("최소 간격 배율"), Range(0.1f, 1.0f)]
+    [SerializeField] private float minIntervalMultiplier = 0.5f;
+
+    [LabelText("난이도 최대 도달 시간"), SuffixLabel("초")]
+    [SerializeField] private float difficultyRampTime = 300f;
+
+    [Title("참조")]
+    [ReadOnly, LabelText("플레이어 트랜스폼")]
     [SerializeField] private Transform playerTransform;
 
     private StageConfig _currentConfig;
+    private float _stageStartTime;
     private float _lastSpawnTime;
     private bool _isSpawningActive = false;
 
@@ -47,9 +68,7 @@ public class EnemySpawner : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// 지정된 스테이지 설정으로 스폰을 시작합니다.
-    /// </summary>
+    [Button("스테이지 강제 시작", ButtonSizes.Medium), GUIColor(0, 1, 0)]
     public void StartStage(int stageNumber)
     {
         _currentConfig = stageConfigs.Find(c => c.stageNumber == stageNumber);
@@ -59,22 +78,19 @@ public class EnemySpawner : MonoBehaviour
             return;
         }
 
-        // --- 스테이지 시작 시 적 프리웜(Pre-warm) 수행 ---
         if (EnemyManager.Instance != null && _currentConfig.spawnableEnemies != null)
         {
             foreach (var enemyPrefab in _currentConfig.spawnableEnemies)
             {
                 if (enemyPrefab != null)
-                {
-                    EnemyManager.Instance.PreWarmEnemy(enemyPrefab, 20); // 각 종류별 20마리씩 미리 생성
-                }
+                    EnemyManager.Instance.PreWarmEnemy(enemyPrefab, 20);
             }
         }
 
         _isSpawningActive = true;
+        _stageStartTime = Time.time;
         _lastSpawnTime = Time.time;
 
-        // 특수 패턴들 실행 (코루틴)
         foreach (var pattern in _currentConfig.specialPatterns)
         {
             if (pattern != null) StartCoroutine(pattern.Execute(this));
@@ -83,17 +99,26 @@ public class EnemySpawner : MonoBehaviour
         Debug.Log($"[Spawner] 스테이지 {_currentConfig.stageNumber} 스폰 시작!");
     }
 
+    [Button("스폰 중단", ButtonSizes.Medium), GUIColor(1, 0, 0)]
     public void StopSpawning()
     {
         _isSpawningActive = false;
-        StopAllCoroutines(); // 진행 중인 특수 패턴 중단
+        StopAllCoroutines();
     }
 
     private void Update()
     {
         if (!_isSpawningActive || _currentConfig == null) return;
 
-        if (Time.time >= _lastSpawnTime + _currentConfig.spawnInterval)
+        float currentInterval = _currentConfig.spawnInterval;
+        if (useDynamicInterval)
+        {
+            float elapsed = Time.time - _stageStartTime;
+            float difficultyRatio = Mathf.Clamp01(elapsed / difficultyRampTime);
+            currentInterval *= Mathf.Lerp(1.0f, minIntervalMultiplier, difficultyRatio);
+        }
+
+        if (Time.time >= _lastSpawnTime + currentInterval)
         {
             SpawnRandomEnemy();
             _lastSpawnTime = Time.time;
@@ -126,4 +151,3 @@ public class EnemySpawner : MonoBehaviour
         return enemyObj;
     }
 }
-

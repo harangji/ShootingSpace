@@ -1,28 +1,20 @@
 using UnityEngine;
-
-/// <summary>
-/// 모든 필살기가 구현해야 하는 인터페이스입니다.
-/// </summary>
-public interface IUltimateSkill
-{
-    string SkillName { get; }
-    float RequiredGauge { get; }
-    float Duration { get; }
-    
-    void Activate(PlayerController controller);
-    void Deactivate(PlayerController controller);
-}
+using Sirenix.OdinInspector;
 
 /// <summary>
 /// 필살기의 공통 데이터를 관리하는 추상 베이스 클래스입니다.
-/// [System.Serializable]을 통해 인스펙터에서 수정 가능하게 합니다.
 /// </summary>
 [System.Serializable]
 public abstract class UltimateSkillBase : IUltimateSkill
 {
-    [Header("Ultimate Info")]
+    [Title("필살기 기본 정보")]
+    [LabelText("스킬 이름")]
     [SerializeField] private string skillName = "New Ultimate";
+
+    [LabelText("소모 게이지"), SuffixLabel("Point")]
     [SerializeField] private float requiredGauge = 100f;
+
+    [LabelText("지속 시간"), SuffixLabel("초")]
     [SerializeField] private float duration = 5f;
 
     public string SkillName => skillName;

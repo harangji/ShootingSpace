@@ -1,4 +1,5 @@
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 /// <summary>
 /// 새로운 무기를 해금하고 장착할 수 있게 해주는 증강 타입입니다.
@@ -6,14 +7,15 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "WeaponUnlock", menuName = "ShootingSpace/Augments/WeaponUnlock")]
 public class WeaponUnlockSO : AugmentSO
 {
-    [Header("New Weapon")]
-    public WeaponBase weaponPrefab; // 장착할 무기 프리팹
+    [Title("신규 무기 설정")]
+    [LabelText("무기 프리팹"), AssetSelector(Paths = "Assets/9.Prefab/HR/Weapon")]
+    [Required("장착할 무기 프리팹이 필요합니다.")]
+    public WeaponBase weaponPrefab;
 
     private void OnEnable()
     {
         type = AugmentType.NewWeapon;
     }
 
-    // 무기 획득 시 발사 로직 수정은 필요 없으므로 빈 구현
     public override void ModifyFire(FireContext context) { }
 }

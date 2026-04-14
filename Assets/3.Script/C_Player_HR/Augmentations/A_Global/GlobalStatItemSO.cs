@@ -1,4 +1,5 @@
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 /// <summary>
 /// 모든 무기에 적용되는 전역 아이템 증강입니다.
@@ -6,33 +7,36 @@ using UnityEngine;
 [CreateAssetMenu(fileName = "GlobalStatItem", menuName = "ShootingSpace/Augments/Global/StatItem")]
 public class GlobalStatItemSO : ItemAugmentSO
 {
-    [Header("Global Stat Boost")]
+    [Title("전역 무기 강화 배율")]
+    [LabelText("연사 속도 보너스"), Tooltip("1.0 이 기본입니다.")]
     public float fireRateBoost = 1.0f; 
+    [LabelText("데미지 보너스")]
     public float damageBoost = 1.0f;   
-    public float scaleBoost = 1.0f;    // 탄환 크기 배율
+    [LabelText("탄환 크기 배율")]
+    public float scaleBoost = 1.0f;
 
-    [Header("Player Stat Boost")]
+    [Title("플레이어 강화 배율")]
+    [LabelText("최대 체력 배율")]
     public float healthMultiplier = 1.0f;
+    [LabelText("이동 속도 배율")]
     public float moveSpeedMultiplier = 1.0f;
+    [LabelText("경험치 획득 배율")]
     public float expMultiplier = 1.0f;
     
-    // 무기 자체 스탯 수정
     public override void ModifyWeapon(WeaponContext context)
     {
         context.fireRateMultiplier *= fireRateBoost;
         context.damageMultiplier *= damageBoost;
     }
 
-    // 플레이어 스탯 수정
     public override void ModifyPlayer(PlayerContext context)
     {
         context.maxHealthMultiplier *= healthMultiplier;
         context.moveSpeedMultiplier *= moveSpeedMultiplier;
         context.expGainMultiplier *= expMultiplier;
-        context.damageMultiplier *= damageBoost; // 모든 무기에 공통 데미지 증가 적용
+        context.damageMultiplier *= damageBoost;
     }
 
-    // 발사 시 탄환 개별 데이터(크기) 수정
     public override void ModifyFire(FireContext context) 
     {
         if (context == null || context.bullets == null) return;
@@ -40,7 +44,7 @@ public class GlobalStatItemSO : ItemAugmentSO
         for (int i = 0; i < context.bullets.Count; i++)
         {
             var bullet = context.bullets[i];
-            bullet.scale *= scaleBoost; // 모든 탄환 크기 업그레이드
+            bullet.scale *= scaleBoost;
             context.bullets[i] = bullet;
         }
     }

@@ -8,7 +8,7 @@ public class FollowEnemy : EnemyBase
 {
     protected override void HandleMovement()
     {
-        // 참조가 없으면 다시 확인한다냐!
+        // 참조가 없으면 다시 확인합니다.
         if (playerTransform == null) EnsurePlayerReference();
         if (playerTransform == null) return;
 
