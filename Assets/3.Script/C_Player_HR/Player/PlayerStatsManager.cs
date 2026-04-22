@@ -18,6 +18,9 @@ public class PlayerStatsManager : MonoBehaviour
     [ReadOnly, LabelText("최종 최대 체력"), GUIColor(1, 0.8f, 0.8f)]
     [ShowInInspector] public int MaxHealth { get; private set; }
 
+    [ReadOnly, LabelText("현재 체력"), GUIColor(1, 0.5f, 0.5f)]
+    [ShowInInspector] public ClampedInt Health { get; private set; }
+
     [ReadOnly, LabelText("최종 이동 속도"), GUIColor(0.8f, 1, 0.8f)]
     [ShowInInspector] public float MoveSpeed { get; private set; }
 
@@ -28,6 +31,16 @@ public class PlayerStatsManager : MonoBehaviour
 
     private float _ultimateDamageMultiplier = 1.0f;
     private float _ultimateFireRateMultiplier = 1.0f;
+
+    public event System.Action OnDamaged;
+
+    public void TakeDamage(int damage)
+    {
+        Health.Decrease(damage);
+        OnDamaged?.Invoke();
+    }
+
+    public void Heal(int amount) => Health.Increase(amount);
 
     public void SetUltimateMultipliers(float damage, float fireRate)
     {
@@ -47,7 +60,20 @@ public class PlayerStatsManager : MonoBehaviour
         CurrentContext.ultimateDamageMultiplier = _ultimateDamageMultiplier;
         CurrentContext.ultimateFireRateMultiplier = _ultimateFireRateMultiplier;
 
+        int oldMaxHealth = MaxHealth;
         MaxHealth = Mathf.RoundToInt(baseMaxHealth * CurrentContext.maxHealthMultiplier);
+        
+        if (Health == null)
+        {
+            Health = new ClampedInt(0, MaxHealth, MaxHealth);
+        }
+        else
+        {
+            int currentHealth = Health.Current;
+            Health.SetMinMax(0, MaxHealth);
+            // 필요 시 추가적인 체력 보정 로직 (예: 최대 체력이 늘어나면 그대로 유지)
+        }
+
         MoveSpeed = baseMoveSpeed * CurrentContext.moveSpeedMultiplier;
         ExpMultiplier = CurrentContext.expGainMultiplier;
     }

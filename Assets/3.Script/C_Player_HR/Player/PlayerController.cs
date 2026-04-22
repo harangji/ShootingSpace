@@ -1,3 +1,4 @@
+using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -11,6 +12,14 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private PlayerStatsManager stats;
     [SerializeField] private PlayerMovement movement;
     [SerializeField] private PlayerEquipment equipment;
+    
+    [Title("피격 효과")]
+    [SerializeField] private SpriteRenderer playerSprite;
+    [SerializeField] private Color hitColor = Color.red;
+    [SerializeField] private float hitDuration = 0.1f;
+    
+    private Color _originalColor;
+    private Coroutine _hitCoroutine;
 
     public PlayerEquipment Equipment => equipment;
 
@@ -19,6 +28,28 @@ public class PlayerController : MonoBehaviour
         // 초기화
         equipment.Initialize();
         RefreshAllStats();
+        
+        if (playerSprite != null) _originalColor = playerSprite.color;
+        stats.OnDamaged += PlayHitEffect;
+    }
+
+    private void OnDestroy()
+    {
+        stats.OnDamaged -= PlayHitEffect;
+    }
+
+    private void PlayHitEffect()
+    {
+        if (playerSprite == null) return;
+        if (_hitCoroutine != null) StopCoroutine(_hitCoroutine);
+        _hitCoroutine = StartCoroutine(HitEffectRoutine());
+    }
+
+    private System.Collections.IEnumerator HitEffectRoutine()
+    {
+        playerSprite.color = hitColor;
+        yield return new WaitForSeconds(hitDuration);
+        playerSprite.color = _originalColor;
     }
 
     /// <summary>

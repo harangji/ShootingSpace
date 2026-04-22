@@ -6,19 +6,15 @@ using UnityEngine;
 /// </summary>
 public class FollowEnemy : EnemyBase
 {
-    protected override void HandleMovement()
+    protected void HandleMovement()
     {
-        // 참조가 없으면 다시 확인합니다.
-        if (playerTransform == null) EnsurePlayerReference();
-        if (playerTransform == null) return;
-
         // 플레이어 방향으로의 벡터 계산 (2D)
         Vector2 currentPos = transform.position;
-        Vector2 playerPos = playerTransform.position;
+        Vector2 playerPos = GameManager.Instance.playerTransform.position;
         Vector2 direction = (playerPos - currentPos).normalized;
         
         // Transform을 이용한 2D 이동
-        transform.Translate(direction * (moveSpeed * Time.deltaTime), Space.World);
+        transform.Translate(direction * (stats.moveSpeed * Time.deltaTime), Space.World);
 
         // 2D 회전: Sprite의 위쪽(Up)이 진행 방향을 향하도록 설정
         if (direction != Vector2.zero)
@@ -32,9 +28,6 @@ public class FollowEnemy : EnemyBase
     /// </summary>
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player"))
-        {
-            Debug.Log("[Enemy] 플레이어와 충돌");
-        }
+        TryApplyBumpDamage(other);
     }
 }

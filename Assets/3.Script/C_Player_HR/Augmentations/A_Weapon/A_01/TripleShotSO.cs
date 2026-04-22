@@ -15,6 +15,16 @@ public class TripleShotSO : WeaponAugmentSO
     [Tooltip("탄환 수가 늘어나는 대신 개별 데미지가 줄어듭니다.")]
     [SerializeField] private float damageMultiplier = 0.7f;
 
+    public override string GetDescription()
+    {
+        int currentCount = 2 + level;
+        int nextCount = 2 + level + 1;
+        string lvText = IsMaxLevel ? "최대 레벨" : $"Lv.{level} -> Lv.{level + 1}";
+        string nextEffect = IsMaxLevel ? "" : $"\n(다음: {nextCount}발 발사)";
+
+        return $"{description}\n[현재: {currentCount}발 발사]\n<{lvText}>{nextEffect}";
+    }
+
     public override void ModifyWeapon(WeaponContext context)
     {
         context.damageMultiplier *= damageMultiplier;
@@ -27,12 +37,18 @@ public class TripleShotSO : WeaponAugmentSO
         BulletData original = context.bullets[0];
         context.bullets.Clear();
 
-        float[] angles = { -spreadAngle, 0f, spreadAngle };
+        // 레벨 1일 때 3발, 레벨 2일 때 4발... (n + 1 로직 적용)
+        int bulletCount = 2 + level;
+        
+        // 전체 퍼짐 정도를 계산하여 각 탄환의 각도를 결정
+        // 예: 3발일 경우 -spreadAngle, 0, +spreadAngle
+        float startAngle = -(bulletCount - 1) * spreadAngle * 0.5f;
 
-        foreach (float angle in angles)
+        for (int i = 0; i < bulletCount; i++)
         {
             BulletData newBullet = original;
-            Quaternion rotation = Quaternion.Euler(0, 0, angle);
+            float currentAngle = startAngle + (i * spreadAngle);
+            Quaternion rotation = Quaternion.Euler(0, 0, currentAngle);
             newBullet.direction = rotation * original.direction;
             context.bullets.Add(newBullet);
         }

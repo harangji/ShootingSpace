@@ -17,6 +17,7 @@ public abstract class WeaponBase : MonoBehaviour, IWeapon
     [SerializeField] protected List<WeaponAugmentSO> initialAugments = new List<WeaponAugmentSO>();
 
     [ShowInInspector, LabelText("활성화된 증강 리스트"), ReadOnly]
+    [ListDrawerSettings(ListElementLabelName = "DisplayName")]
     protected List<IAugment> activeModifiers = new List<IAugment>();
 
     [TitleGroup("필살기")]
@@ -56,7 +57,17 @@ public abstract class WeaponBase : MonoBehaviour, IWeapon
             return false;
         }
 
-        if (HasAugment(augment.augmentName)) return false;
+        // 기존 증강이 있는지 확인
+        AugmentSO existing = activeModifiers.Find(m => (m is AugmentSO so) && so.augmentName == augment.augmentName) as AugmentSO;
+        if (existing != null)
+        {
+            if (existing.IsMaxLevel) return false;
+            
+            existing.LevelUp();
+            Debug.Log($"[{weaponID}] {existing.augmentName} 레벨업! (Lv.{existing.level})");
+            if (refresh) RequestTotalRefresh();
+            return true;
+        }
 
         AugmentSO instance = Instantiate(augment);
         activeModifiers.Add(instance);
@@ -64,6 +75,8 @@ public abstract class WeaponBase : MonoBehaviour, IWeapon
         if (refresh) RequestTotalRefresh();
         return true;
     }
+
+    public AugmentSO GetAugment(string augmentName) => activeModifiers.Find(m => (m is AugmentSO so) && so.augmentName == augmentName) as AugmentSO;
 
     public virtual bool RemoveAugment(string augmentName)
     {

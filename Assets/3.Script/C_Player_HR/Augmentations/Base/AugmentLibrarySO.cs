@@ -19,6 +19,7 @@ public class AugmentLibrarySO : SerializedScriptableObject
     [SerializeField] private string rootFolder = "Assets/Resources/HR_SO/Augments";
 
     [TabGroup("Main", "전역 증강 (Global)", SdfIconType.Globe)]
+    [ListDrawerSettings(ListElementLabelName = "DisplayName")]
     public List<ItemAugmentSO> globalItems = new List<ItemAugmentSO>();
 
     [TabGroup("Main", "무기 증강 (Weapon)", SdfIconType.Bullseye)]
@@ -27,6 +28,7 @@ public class AugmentLibrarySO : SerializedScriptableObject
     public Dictionary<string, List<WeaponAugmentSO>> weaponAugmentGroups = new Dictionary<string, List<WeaponAugmentSO>>();
 
     [TabGroup("Main", "무기 해금 (Unlock)", SdfIconType.Key)]
+    [ListDrawerSettings(ListElementLabelName = "DisplayName")]
     public List<WeaponUnlockSO> weaponUnlocks = new List<WeaponUnlockSO>();
 
     [Button(ButtonSizes.Large, Name = "라이브러리 전체 갱신 (폴더 기반)")]

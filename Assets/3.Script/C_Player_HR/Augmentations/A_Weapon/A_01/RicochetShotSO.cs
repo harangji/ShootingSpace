@@ -12,6 +12,16 @@ public class RicochetShotSO : WeaponAugmentSO
     [Tooltip("탄환이 근처 적에게 튕기는 최대 횟수입니다.")]
     [SerializeField] private int bounceCount = 2;
 
+    public override string GetDescription()
+    {
+        int current = bounceCount * level;
+        int next = bounceCount * (level + 1);
+        string lvText = IsMaxLevel ? "최대 레벨" : $"Lv.{level} -> Lv.{level + 1}";
+        string nextEffect = IsMaxLevel ? "" : $"\n(다음: {next}회 도탄)";
+        
+        return $"{description}\n[현재: {current}회 도탄]\n<{lvText}>{nextEffect}";
+    }
+
     public override void ModifyFire(FireContext context)
     {
         if (context == null || context.bullets == null) return;
@@ -19,7 +29,8 @@ public class RicochetShotSO : WeaponAugmentSO
         for (int i = 0; i < context.bullets.Count; i++)
         {
             var bullet = context.bullets[i];
-            bullet.bounceCount = bounceCount;
+            // 레벨에 비례하여 도탄 횟수 설정
+            bullet.bounceCount = bounceCount * level;
             context.bullets[i] = bullet;
         }
     }

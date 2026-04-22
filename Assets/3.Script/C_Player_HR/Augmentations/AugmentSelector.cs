@@ -47,8 +47,14 @@ public static class AugmentSelector
                 return !existingItem.IsMaxLevel;
 
             case WeaponAugmentSO wAug:
-                // 소지 중인 무기 중에 대상 ID가 있는지 확인
-                return eq.WeaponSlots.Any(w => w != null && w.WeaponID == wAug.targetWeaponID && !w.HasAugment(wAug.augmentName));
+                // 소지 중인 무기 중에 대상 ID가 있고, 해당 증강이 없거나 최대 레벨이 아닌지 확인
+                return eq.WeaponSlots.Any(w => 
+                {
+                    if (w == null || w.WeaponID != wAug.targetWeaponID) return false;
+                    AugmentSO existing = w.GetAugment(wAug.augmentName);
+                    if (existing == null) return true; // 아직 없음 -> 등장 가능
+                    return !existing.IsMaxLevel;      // 있음 -> 최대 레벨 아니면 등장 가능
+                });
 
             case WeaponUnlockSO unlock:
                 if (unlock.weaponPrefab == null)

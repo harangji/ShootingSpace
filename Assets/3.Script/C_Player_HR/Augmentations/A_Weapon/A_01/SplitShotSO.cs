@@ -16,6 +16,16 @@ public class SplitShotSO : WeaponAugmentSO
     [Tooltip("분열된 탄환의 크기 배율입니다.")]
     [SerializeField] private float scaleMultiplier = 0.3f;
 
+    public override string GetDescription()
+    {
+        int current = splitCount * level;
+        int next = splitCount * (level + 1);
+        string lvText = IsMaxLevel ? "최대 레벨" : $"Lv.{level} -> Lv.{level + 1}";
+        string nextEffect = IsMaxLevel ? "" : $"\n(다음: {next}개 분열)";
+        
+        return $"{description}\n[현재: {current}개 분열]\n<{lvText}>{nextEffect}";
+    }
+
     /// <summary>
     /// 발사되는 모든 탄환에 분열 데이터를 심어줍니다.
     /// </summary>
@@ -27,8 +37,8 @@ public class SplitShotSO : WeaponAugmentSO
         {
             var bullet = context.bullets[i];
             
-            // 분열 정보 주입
-            bullet.splitCount = splitCount;
+            // 분열 정보 주입 (레벨당 분열 개수 증가)
+            bullet.splitCount = splitCount * level;
             bullet.splitDamageMultiplier = damageMultiplier;
             bullet.splitScaleMultiplier = scaleMultiplier;
             

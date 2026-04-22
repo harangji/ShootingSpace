@@ -23,28 +23,41 @@ public class GlobalStatItemSO : ItemAugmentSO
     [LabelText("경험치 획득 배율")]
     public float expMultiplier = 1.0f;
     
+    public override string GetDescription()
+    {
+        string currentStats = "";
+        if (fireRateBoost != 1.0f) currentStats += $"\n- 연사 속도: +{Mathf.RoundToInt((fireRateBoost - 1f) * level * 100f)}%";
+        if (damageBoost != 1.0f) currentStats += $"\n- 데미지: +{Mathf.RoundToInt((damageBoost - 1f) * level * 100f)}%";
+        if (scaleBoost != 1.0f) currentStats += $"\n- 탄환 크기: +{Mathf.RoundToInt((scaleBoost - 1f) * level * 100f)}%";
+        if (moveSpeedMultiplier != 1.0f) currentStats += $"\n- 이동 속도: +{Mathf.RoundToInt((moveSpeedMultiplier - 1f) * level * 100f)}%";
+        
+        string lvText = IsMaxLevel ? "최대 레벨" : $"Lv.{level} -> Lv.{level + 1}";
+        return $"{description}{currentStats}\n<{lvText}>";
+    }
+
     public override void ModifyWeapon(WeaponContext context)
     {
-        context.fireRateMultiplier *= fireRateBoost;
-        context.damageMultiplier *= damageBoost;
+        context.fireRateMultiplier *= (1f + (fireRateBoost - 1f) * level);
+        context.damageMultiplier *= (1f + (damageBoost - 1f) * level);
     }
 
     public override void ModifyPlayer(PlayerContext context)
     {
-        context.maxHealthMultiplier *= healthMultiplier;
-        context.moveSpeedMultiplier *= moveSpeedMultiplier;
-        context.expGainMultiplier *= expMultiplier;
-        context.damageMultiplier *= damageBoost;
+        context.maxHealthMultiplier *= (1f + (healthMultiplier - 1f) * level);
+        context.moveSpeedMultiplier *= (1f + (moveSpeedMultiplier - 1f) * level);
+        context.expGainMultiplier *= (1f + (expMultiplier - 1f) * level);
+        context.damageMultiplier *= (1f + (damageBoost - 1f) * level);
     }
 
     public override void ModifyFire(FireContext context) 
     {
         if (context == null || context.bullets == null) return;
 
+        float effectiveScaleBoost = (1f + (scaleBoost - 1f) * level);
         for (int i = 0; i < context.bullets.Count; i++)
         {
             var bullet = context.bullets[i];
-            bullet.scale *= scaleBoost;
+            bullet.scale *= effectiveScaleBoost;
             context.bullets[i] = bullet;
         }
     }

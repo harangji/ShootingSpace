@@ -40,7 +40,7 @@ public class PlayerEquipment : MonoBehaviour
     [ListDrawerSettings(IsReadOnly = true, ShowIndexLabels = true)]
     [SerializeField] private List<WeaponBase> weaponSlots = new List<WeaponBase>();
 
-    [ListDrawerSettings(IsReadOnly = true, ShowIndexLabels = true)]
+    [ListDrawerSettings(IsReadOnly = true, ShowIndexLabels = true, ListElementLabelName = "DisplayName")]
     [SerializeField] private List<ItemAugmentSO> itemSlots = new List<ItemAugmentSO>();
 
     public List<WeaponBase> WeaponSlots => weaponSlots;
