@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
@@ -64,8 +65,20 @@ public abstract class ProjectileWeaponBase<T> : WeaponBase where T : Component, 
         float currentFireRate = baseFireRate * currentWeaponContext.fireRateMultiplier;
         if (Time.time < lastFireTime + (1f / currentFireRate)) return;
 
-        foreach (var bulletData in cachedBullets) SpawnProjectile(bulletData);
+        int burstCount = (cachedBullets.Count > 0 && cachedBullets[0].multiShotCount > 0) ? (cachedBullets[0].multiShotCount + 1) : 1;
+
+        StartCoroutine(FireCoroutine(burstCount, 0.2f));
+
         lastFireTime = Time.time;
+    }
+
+    private IEnumerator FireCoroutine(int burstCount, float interval)
+    {
+        for (int i = 0; i < burstCount; i++)
+        {
+            foreach (var bulletData in cachedBullets) SpawnProjectile(bulletData);
+            yield return new WaitForSeconds(interval);
+        }
     }
 
     protected virtual void SpawnProjectile(BulletData bulletData)
