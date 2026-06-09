@@ -79,8 +79,12 @@ public struct BulletData
     // 도탄 관련 데이터 추가
     public int bounceCount;         // 도탄 가능 횟수
     
-    // 다중 발사 관련 데이터 추가 (발사 횟수)
-    public int multiShotCount;
+    // 다중(연속) 발사 관련 데이터 추가 
+    public int multiShotCount;      // 다중(연속) 발사 가능 횟수
+    public float multiShotInterval; // 다중(연속) 발사 간격
+    
+    // 회정 총알 관련 데이터 추가
+    public float spinSpeed;     // 회전 속도
 
     // 기본값이 설정된 BulletData를 반환하는 정적 속성
     public static BulletData Default => new BulletData
@@ -93,7 +97,9 @@ public struct BulletData
         splitDamageMultiplier = 0.5f,
         splitScaleMultiplier = 0.5f,
         bounceCount = 0,
-        multiShotCount = 0
+        multiShotCount = 0,
+        multiShotInterval = 0.2f,
+        spinSpeed = 2.0f
     };
     
     public BulletData(Vector2 direction, int damage, float speed, Vector3 baseScale, Sprite sprite = null)
@@ -109,5 +115,7 @@ public struct BulletData
         this.splitScaleMultiplier = 0.5f;
         this.bounceCount = 0;
         this.multiShotCount = 0;
+        this.multiShotInterval = 0.2f;
+        this.spinSpeed = 2.0f;
     }
 }

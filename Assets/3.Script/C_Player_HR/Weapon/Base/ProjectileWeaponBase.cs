@@ -10,7 +10,7 @@ public abstract class ProjectileWeaponBase<T> : WeaponBase where T : Component, 
 {
     [TitleGroup("발사 기본 스탯")]
     [LabelText("기본 연사 속도"), SuffixLabel("발/초")]
-    [SerializeField] protected float baseFireRate = 2.0f;
+    [SerializeField] protected float baseFireRate = 0.5f;
 
     [LabelText("기본 데미지")]
     [SerializeField] protected int baseDamage = 10;
@@ -66,8 +66,9 @@ public abstract class ProjectileWeaponBase<T> : WeaponBase where T : Component, 
         if (Time.time < lastFireTime + (1f / currentFireRate)) return;
 
         int burstCount = (cachedBullets.Count > 0 && cachedBullets[0].multiShotCount > 0) ? (cachedBullets[0].multiShotCount + 1) : 1;
+        float interval = cachedBullets[0].multiShotInterval;
 
-        StartCoroutine(FireCoroutine(burstCount, 0.2f));
+        StartCoroutine(FireCoroutine(burstCount, interval));
 
         lastFireTime = Time.time;
     }
