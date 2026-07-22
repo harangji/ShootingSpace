@@ -17,6 +17,11 @@ MonoBehaviour:
     SerializedBytes: 
     ReferencedUnityObjects:
     - {fileID: 11400000, guid: dfaf6685b919cc74cb445c0c2028997a, type: 2}
+    - {fileID: 11400000, guid: 29e1b8aa47ab4ad49b832e989b5f5af9, type: 2}
+    - {fileID: 11400000, guid: 398756bd0362e8c4dbfec1c7729c2670, type: 2}
+    - {fileID: 11400000, guid: 2ac62bba11a487546aa50786fca82595, type: 2}
+    - {fileID: 11400000, guid: e6859e3c23c59ae4eb74ab0ed8d843df, type: 2}
+    - {fileID: 11400000, guid: f6eeb5570d49e214e84eb144bde41990, type: 2}
     SerializedBytesString: 
     Prefab: {fileID: 0}
     PrefabModificationsReferencedUnityObjects: []
@@ -35,7 +40,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 1
+      Data: 3
     - Name: 
       Entry: 7
       Data: 
@@ -62,6 +67,65 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Gun_03
+    - Name: $v
+      Entry: 7
+      Data: 3|System.Collections.Generic.List`1[[WeaponAugmentSO, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 10
+      Data: 1
+    - Name: 
+      Entry: 10
+      Data: 2
+    - Name: 
+      Entry: 10
+      Data: 3
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Gun_05
+    - Name: $v
+      Entry: 7
+      Data: 4|System.Collections.Generic.List`1[[WeaponAugmentSO, Assembly-CSharp]],
+        mscorlib
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 10
+      Data: 4
+    - Name: 
+      Entry: 10
+      Data: 5
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
       Entry: 13
       Data: 
     - Name: 
@@ -76,3 +140,4 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c4906ab6ded987745b313247084ebe81, type: 2}
   - {fileID: 11400000, guid: 99892d9fe595f8b48a2ee63602f4801e, type: 2}
   - {fileID: 11400000, guid: d167efe9d4f732244b12618fa7fb4b0a, type: 2}
+  - {fileID: 11400000, guid: 2124fb069237adf4a860cba6625be370, type: 2}

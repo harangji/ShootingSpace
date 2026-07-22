@@ -1,3 +1,4 @@
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Sirenix.OdinInspector;
@@ -9,7 +10,7 @@ public abstract class ProjectileWeaponBase<T> : WeaponBase where T : Component, 
 {
     [TitleGroup("발사 기본 스탯")]
     [LabelText("기본 연사 속도"), SuffixLabel("발/초")]
-    [SerializeField] protected float baseFireRate = 2.0f;
+    [SerializeField] protected float baseFireRate = 0.5f;
 
     [LabelText("기본 데미지")]
     [SerializeField] protected int baseDamage = 10;
@@ -64,8 +65,21 @@ public abstract class ProjectileWeaponBase<T> : WeaponBase where T : Component, 
         float currentFireRate = baseFireRate * currentWeaponContext.fireRateMultiplier;
         if (Time.time < lastFireTime + (1f / currentFireRate)) return;
 
-        foreach (var bulletData in cachedBullets) SpawnProjectile(bulletData);
+        int burstCount = (cachedBullets.Count > 0 && cachedBullets[0].multiShotCount > 0) ? (cachedBullets[0].multiShotCount + 1) : 1;
+        float interval = cachedBullets[0].multiShotInterval;
+
+        StartCoroutine(FireCoroutine(burstCount, interval));
+
         lastFireTime = Time.time;
+    }
+
+    private IEnumerator FireCoroutine(int burstCount, float interval)
+    {
+        for (int i = 0; i < burstCount; i++)
+        {
+            foreach (var bulletData in cachedBullets) SpawnProjectile(bulletData);
+            yield return new WaitForSeconds(interval);
+        }
     }
 
     protected virtual void SpawnProjectile(BulletData bulletData)
