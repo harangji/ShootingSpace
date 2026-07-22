@@ -5,13 +5,13 @@ using UnityEngine;
 /// </summary>
 public abstract class EnemyStateBase : MonoBehaviour
 {
-    protected EnemyBase owner;
+    protected EnemyBase Owner;
 
     public abstract EnemyStateName Name { get; }
 
-    public virtual void Initialize(EnemyBase enemy)
+    public void Initialize(EnemyBase enemy)
     {
-        owner = enemy;
+        Owner = enemy;
     }
 
     public abstract void OnEnterState();

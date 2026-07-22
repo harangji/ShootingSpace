@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Pool;
-using ShootingSpace.Core;
 
 /// <summary>
 /// 적중 시 주변의 원형 범위 내의 모든 적에게 데미지를 주는 폭발형 탄환입니다.

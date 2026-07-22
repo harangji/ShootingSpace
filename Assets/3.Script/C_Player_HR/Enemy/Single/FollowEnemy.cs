@@ -22,12 +22,4 @@ public class FollowEnemy : EnemyBase
             transform.up = direction;
         }
     }
-
-    /// <summary>
-    /// 플레이어와 충돌했을 때의 처리 (Trigger 체크)
-    /// </summary>
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        TryApplyBumpDamage(other);
-    }
 }

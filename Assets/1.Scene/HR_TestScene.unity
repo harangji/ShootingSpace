@@ -616,16 +616,15 @@ MonoBehaviour:
     moveSpeed: 1
     rotationSpeed: 0
   visuals:
-    hitColor: {r: 1, g: 0, b: 0, a: 0}
-    hitEffectDuration: 0.3
     <SpriteRenderer>k__BackingField: {fileID: 627120508}
     <Indicator>k__BackingField: {fileID: 1041003108}
+    <HitEffect>k__BackingField: {fileID: 0}
   stateObjects:
   - {fileID: 458115472}
   - {fileID: 1262840757}
   - {fileID: 2101873516}
   - {fileID: 2049178074}
-  attackStrategy: {fileID: 627120510}
+  attackStrategy: {fileID: 0}
   eCollider: {fileID: 627120511}
   bumpDamage: 5
   bumpCooldown: 1
@@ -641,10 +640,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 068ee897e08aac244992906410221059, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DashAttack
-  description: "\uC804\uBC29\uC73C\uB85C 5m \uAC70\uB9AC\uB97C 15 \uC18D\uB3C4\uB85C
-    \uB3CC\uC9C4\uD558\uC5EC 20\uC758 \uB370\uBBF8\uC9C0\uB97C \uC785\uD799\uB2C8\uB2E4.
-    0.5\uCD08\uAC04 \uACBD\uACE0 \uD6C4 0.5\uCD08 \uB3D9\uC548 \uC774\uB3D9\uD558\uBA70,
-    2\uCD08\uC758 \uC7AC\uC0AC\uC6A9 \uB300\uAE30 \uC2DC\uAC04\uC744 \uAC00\uC9D1\uB2C8\uB2E4."
+  description: "\uC804\uBC29\uC73C\uB85C 5m \uAC70\uB9AC\uB97C \uB3CC\uC9C4\uD558\uC5EC
+    20\uC758 \uB370\uBBF8\uC9C0\uB97C \uC785\uD799\uB2C8\uB2E4. 0.5\uCD08\uAC04 \uACBD\uACE0
+    \uD6C4 0.5\uCD08 \uB3D9\uC548 \uC774\uB3D9\uD558\uBA70, 2\uCD08\uC758 \uC7AC\uC0AC\uC6A9
+    \uB300\uAE30 \uC2DC\uAC04\uC744 \uAC00\uC9D1\uB2C8\uB2E4."
   attackRange: 5
   damage: 20
   warningTime: 0.5
@@ -652,7 +651,6 @@ MonoBehaviour:
   dashWidth: 1.5
   dashDistance: 5
   dashCooldown: 2
-  dashSpeed: 15
   dashDamage: 20
 --- !u!58 &627120511
 CircleCollider2D:
@@ -684,7 +682,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -698,14 +696,14 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 627120506}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
   m_LinearDamping: 0
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -931,12 +929,12 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 627120507}
   - {fileID: 696268947}
   - {fileID: 1707486637}
   - {fileID: 1299734994}
   - {fileID: 1937952469}
   - {fileID: 868407073}
-  - {fileID: 627120507}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &868407072
@@ -1345,7 +1343,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 1, g: 0, b: 0, a: 0.66708547}
+  m_Color: {r: 1, g: 0, b: 0, a: 0.3}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -1634,6 +1632,7 @@ MonoBehaviour:
   playerSprite: {fileID: 0}
   hitColor: {r: 1, g: 0, b: 0, a: 1}
   hitDuration: 0.1
+  playerCollider: {fileID: 1364515897}
 --- !u!114 &1364515894
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1721,7 +1720,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

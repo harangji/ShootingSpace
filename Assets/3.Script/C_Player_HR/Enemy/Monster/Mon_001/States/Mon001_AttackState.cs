@@ -6,8 +6,8 @@ public class Mon001_AttackState : EnemyStateBase
     
     public override async void OnEnterState()
     {
-        await owner.AttackStrategy.ExecuteAsync(owner);
-        owner.ChangeState(EnemyStateName.Chase);
+        await Owner.AttackStrategy.ExecuteAsync(Owner);
+        Owner.ChangeState(EnemyStateName.Chase);
     }
 
     public override void OnUpdateState() { }

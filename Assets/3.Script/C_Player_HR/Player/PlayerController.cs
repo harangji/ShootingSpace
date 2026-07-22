@@ -6,8 +6,7 @@ using UnityEngine.Serialization;
 /// 플레이어 시스템의 중앙 컨트롤러입니다. 
 /// 이동, 스탯, 장비 컴포넌트를 조정하고 전체 상태를 관리합니다.
 /// </summary>
-[RequireComponent(typeof(PlayerStatsManager), typeof(PlayerMovement), typeof(PlayerEquipment))]
-public class PlayerController : MonoBehaviour
+public class PlayerController : MonoBehaviour, IDamageable
 {
     [SerializeField] private PlayerStatsManager stats;
     [SerializeField] private PlayerMovement movement;
@@ -20,6 +19,10 @@ public class PlayerController : MonoBehaviour
     
     private Color _originalColor;
     private Coroutine _hitCoroutine;
+
+    [SerializeField] private Collider2D playerCollider;
+
+    public Collider2D PlayerCollider => playerCollider;
 
     public PlayerEquipment Equipment => equipment;
 
@@ -114,5 +117,10 @@ public class PlayerController : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    public void TakeDamage(int damage)
+    {
+        stats.Health.Decrease(damage);
     }
 }

@@ -4,28 +4,52 @@ public class Mon001_ChaseState : EnemyStateBase
 {
     public override EnemyStateName Name => EnemyStateName.Chase;
 
-    public override void OnEnterState() { }
+    private Transform _player;
+    private Vector2 _direction;
+    private float _distance;
+    private float _stoppingDistance;
+
+    public override void OnEnterState() 
+    {
+        _player = GameManager.Instance.playerTransform;
+    }
 
     public override void OnUpdateState()
     {
-        Transform player = GameManager.Instance.playerTransform;
+        if (!_player) return;
 
-        // 플레이어를 향해 계속 이동
-        Vector2 direction = ((Vector2)player.position - (Vector2)owner.transform.position).normalized;
-        owner.transform.Translate(direction * (owner.GetMoveSpeed() * Time.deltaTime), Space.World);
+        _distance = Vector2.Distance(Owner.transform.position, _player.position);
+        _direction = (_player.position - Owner.transform.position).normalized;
 
-        if (direction != Vector2.zero)
+        // 회전은 사거리와 관계없이 계속 수행
+        Rotate(_direction);
+
+        // 공격 사거리 내라면 공격 실행 및 이동 중지
+        if (_distance <= Owner.AttackRange)
         {
-            owner.transform.up = direction;
+            if (Owner.AttackStrategy.CanExecute())
+            {
+                Owner.ChangeState(EnemyStateName.Attack);
+            }
+            return;
         }
 
-        // 사거리 안에 있고 전략이 사용 가능한 경우에만 공격 상태로 전환
-        float distance = Vector2.Distance(owner.transform.position, player.position);
-        if (distance <= owner.AttackRange && owner.AttackStrategy.CanExecute())
-        {
-            owner.ChangeState(EnemyStateName.Attack);
-        }
+        // 사거리 밖일 때만 이동
+        Move(_direction);
     }
 
     public override void OnExitState() { }
+    
+    private void Move(Vector2 direction)
+    {
+        Owner.transform.Translate(direction * (Owner.GetMoveSpeed() * Time.deltaTime), Space.World);
+    }
+    
+    private void Rotate(Vector2 direction)
+    {
+        if (direction != Vector2.zero)
+        {
+            Owner.transform.up = direction;
+        }
+    }
 }

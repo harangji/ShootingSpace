@@ -6,8 +6,8 @@ public class Mon001_DieState : EnemyStateBase
 
     public override void OnEnterState()
     {
-        EnemyManager.Instance.ReportEnemyKilled(owner);
-        EnemyManager.Instance.ReleaseEnemy(owner);
+        EnemyManager.Instance.ReportEnemyKilled(Owner);
+        EnemyManager.Instance.ReleaseEnemy(Owner);
     }
     public override void OnUpdateState() { }
     public override void OnExitState() { }

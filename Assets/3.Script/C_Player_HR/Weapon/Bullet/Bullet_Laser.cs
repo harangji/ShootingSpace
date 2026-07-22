@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Pool;
-using ShootingSpace.Core;
 using Sirenix.OdinInspector;
 
 /// <summary>

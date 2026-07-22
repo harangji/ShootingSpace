@@ -1,12 +1,7 @@
 using UnityEngine;
-using UnityEngine.Pool;
-using ShootingSpace.Core;
-using System.Collections;
 using System;
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
-using Unity.VisualScripting;
-using UnityEngine.Serialization;
 
 /// <summary>
 /// 적의 상태 종류를 정의하는 열거형입니다.
@@ -38,17 +33,9 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
     }
     [Serializable] public class Visuals
     {
-        [LabelText("피격 색상")] public Color hitColor;
-        [LabelText("피격 효과 시간")] public float hitEffectDuration;
-
         [field: SerializeField, LabelText("스프라이트 렌더러")] public SpriteRenderer SpriteRenderer { get; private set; }
         [field: SerializeField, LabelText("공격 인디케이터")] public EnemyIndicator Indicator { get; private set; }
-        public Color OriginalColor {get; private set;}
-        
-        public void CacheOriginalColor()
-        {
-            OriginalColor = SpriteRenderer.color;
-        }
+        [field: SerializeField, LabelText("피격 효과")] public EnemyHitEffect HitEffect { get; private set; }
     }
     
     public Stats stats;
@@ -65,8 +52,6 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
     [SerializeField] private AttackStrategyBase attackStrategy; 
     public AttackStrategyBase AttackStrategy => attackStrategy;
     public float AttackRange => attackStrategy != null ? attackStrategy.attackRange : 0f;
-    
-    private Coroutine _hitEffectCoroutine;
     
     //---------------------------------------------------------------------------------------
     [Title("충돌 설정")]
@@ -107,7 +92,6 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
     {
         IsDead = false;
         CurrentState = null;
-        visuals.CacheOriginalColor();
         
         EnemyManager.Instance.RegisterEnemy(this);
         
@@ -157,18 +141,18 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
         }
     }
     
-    /// <summary>
-    /// 충돌 시 데미지를 시도합니다.
-    /// </summary>
-    public void TryApplyBumpDamage(Collider2D other) //메서드 잘못됨. TODO
+    private void OnCollisionEnter2D(Collision2D collision)
     {
         // 특수 공격 중이거나 쿨타임 중이면 무시
         if (IsPerformingSpecialAttack || Time.time < _lastBumpTime + bumpCooldown) return;
 
-        if (other.CompareTag("Player") && other.TryGetComponent<IDamageable>(out var damageable))
+        if (collision.gameObject.CompareTag("Player"))
         {
-            damageable.TakeDamage(bumpDamage);
-            _lastBumpTime = Time.time;
+            if (collision.gameObject.TryGetComponent(out IDamageable damageable))
+            {
+                damageable.TakeDamage(bumpDamage);
+                _lastBumpTime = Time.time;
+            }
         }
     }
     
@@ -177,16 +161,10 @@ public abstract class EnemyBase : MonoBehaviour, IDamageable
         if (IsDead) return;
         stats.CurrentHp.Decrease(damage);
 
-        if (_hitEffectCoroutine != null) StopCoroutine(_hitEffectCoroutine);
-        _hitEffectCoroutine = StartCoroutine(HitEffectRoutine());
-    }
-
-    private IEnumerator HitEffectRoutine()
-    {
-        if (visuals.SpriteRenderer == null) yield break;
-        visuals.SpriteRenderer.color = visuals.hitColor;
-        yield return new WaitForSeconds(visuals.hitEffectDuration);
-        visuals.SpriteRenderer.color = visuals.OriginalColor;
+        if (visuals.HitEffect != null)
+        {
+            visuals.HitEffect.PlayHitEffect();
+        }
     }
 
     private void Die()

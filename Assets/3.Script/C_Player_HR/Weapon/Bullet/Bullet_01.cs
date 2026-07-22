@@ -1,6 +1,5 @@
 using UnityEngine;
 using UnityEngine.Pool; // 유니티 내장 풀링 시스템 라이브러리 추가!
-using ShootingSpace.Core;
 
 /// <summary>
 /// 기본적인 탄환의 동작을 정의하며 유니티 내장 풀과 연동되는 컴포넌트입니다.
